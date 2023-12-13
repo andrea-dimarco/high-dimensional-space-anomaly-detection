@@ -1,4 +1,5 @@
 # Anomaly Detection in High-Dimensional Spaces (2023)
+aka stealth attacks.
 
 This repository contains our project for the course in Automatic Verification of Intelligent Systems and the AFC of Sapienza University.
 

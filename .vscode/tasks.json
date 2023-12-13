@@ -12,7 +12,7 @@
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "${fileDirname}/plant.cpp",
                 "${fileDirname}/RTNAD.cpp",
-                "${fileDirname}/statistics.cpp"
+                "${fileDirname}/statistics.cpp",
             ],
             "options": {
                 "cwd": "${fileDirname}"
