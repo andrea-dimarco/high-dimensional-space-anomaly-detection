@@ -1,2 +1,2 @@
-# high-dimensional-space-anomaly-detection
-And stealth attacks.
+# hAnomaly Detection in High-Dimensional Spaces (2023)
+aka stealth attacks.
