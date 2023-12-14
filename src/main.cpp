@@ -1,6 +1,7 @@
 // Main
 
 #include "include/suv.h"
+#include "include/gem.h"
 
 #include <iostream>
 #include <random>
@@ -15,13 +16,18 @@
  */
 int main()
 {
-    int n, m, r, N;
-    n = 1;
-    m = 1;
-    r = 1;
-    N = 10;
+    int p = 1; // output dimension
+    // sensors are not independent within eachother at time t
+    // different samples taken ad different times t and t' are i.i.d.
 
-    SUV suv;
+    int tau = 10; // change-point (when the anomaly begins)
+
+    // the model is unkown so must be simulated as i.i.d. variables
+    // decide what significant statistics need to be taken
+
+    int N = 5; // number of samples in the nominal data set (data guaranteed to have no anomalies)
+
+    GEM gem(p);
 
     return 0;
 } /* main */

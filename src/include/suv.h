@@ -1,14 +1,15 @@
 #pragma once
 
 #include <iostream>
-#include <Eigen/Dense>
 #include <tuple>
 #include <string>
 #include <fstream>
 #include <vector>
+#include <Eigen/Dense>
+#include <Eigen/src/Core/Map.h>
 
-// X(t) = A*X(t-1) + B*U(t-1)
-// Y(t) = C*X(t-1)
+// x(t) = A*x(t-1) + B*u(t-1)
+// y(t) = C*x(t-1)
 
 class SUV {
 private:

@@ -1,5 +1,5 @@
 #include "include/suv.h"
-#include <Eigen/src/Core/Map.h>
+
 
 SUV::SUV() {
     this->n = 0;
@@ -49,7 +49,7 @@ SUV::SUV(Eigen::MatrixXd Am, Eigen::MatrixXd Bm, Eigen::MatrixXd Cm,
 /**
  * Simulate N steps of the SUV.
 */
-void SUV::run_simulation(bool store_history=true, bool verbose=false) {
+void SUV::run_simulation(bool store_history/*=true*/, bool verbose/*=false*/) {
     if (store_history) {
         for (int j = 0; j < this->N; j++) {
             if (j == 0) {
@@ -83,7 +83,7 @@ void SUV::run_simulation(bool store_history=true, bool verbose=false) {
 /**
  * Simulate t steps of the SUV.
 */
-void SUV::run_simulation_up_to(int t, bool store_history=true, bool verbose=false) {
+void SUV::run_simulation_up_to(int t, bool store_history/*=true*/, bool verbose/*=false*/) {
     if (store_history) {
         for (int j = 0; j < t; j++) {
             if (j == 0) {
@@ -115,7 +115,7 @@ void SUV::run_simulation_up_to(int t, bool store_history=true, bool verbose=fals
  * Returns the output vector at time t.
  * If you have already simulated with no history you will have to simulate again to get the output
 */
-Eigen::MatrixXd SUV::get_output_at_time(int t, bool store_history=true, bool verbose=false) {
+Eigen::MatrixXd SUV::get_output_at_time(int t, bool store_history/*=true*/, bool verbose/*=false*/) {
     if (!simulation_ended) {
         SUV::run_simulation_up_to(t, store_history, verbose);
     }
@@ -166,7 +166,7 @@ void SUV::save_data(std::string A_file_path, std::string B_file_path,
 /**
  * Generate an Eigen matrix out of a previously populated file from the save_data() function
 */
-Eigen::MatrixXd SUV::open_data(std::string file_path, bool is_output=false) {
+Eigen::MatrixXd SUV::open_data(std::string file_path, bool is_output /*=false*/) {
 	
 	// the input is the file: "fileToOpen.csv":
 	// a,b,c
@@ -245,7 +245,7 @@ std::tuple<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd> SUV::get_state_out
  * Run one step and return its outpu.
  * Only use for testing and debugging purposes.
 */
-Eigen::MatrixXd SUV::run_one_step(Eigen::MatrixXd u, bool store_history=true, bool verbose=false) {
+Eigen::MatrixXd SUV::run_one_step(Eigen::MatrixXd u, bool store_history/*=true*/, bool verbose/*=false*/) {
     // u must be of size (m,1)
     if (store_history) {
         this->state_sequence.col(this->current_time) = this->A*this->old_x + this->B*u;
