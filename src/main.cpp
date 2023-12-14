@@ -1,6 +1,6 @@
 // Main
 
-#include "include/plant.h"
+#include "include/suv.h"
 
 #include <iostream>
 #include <random>
@@ -15,6 +15,13 @@
  */
 int main()
 {
-    
+    int n, m, r, N;
+    n = 1;
+    m = 1;
+    r = 1;
+    N = 10;
+
+    SUV suv;
+
     return 0;
 } /* main */

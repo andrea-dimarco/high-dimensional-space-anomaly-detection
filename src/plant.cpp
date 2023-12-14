@@ -1,6 +1,7 @@
 #include "include/plant.h"
 
 #include <iostream>
+#include <Eigen/Dense>
 
 Plant::Plant() {
     t = 0;

@@ -3,11 +3,11 @@
 class RTNAD {
 private:
     int t;        // time-step
-    double p;
-    double s;
-    double alpha;
-    double g;     // decision statistic
-    double h;     // decision threshold
+    float p;
+    float s;
+    float alpha;
+    float g;     // decision statistic
+    float h;     // decision threshold
     bool   anomaly;
     
 public:

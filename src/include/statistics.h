@@ -2,7 +2,7 @@
 
 class Stats {
 private:
-    double mean;
+    float mean;
 public:
     Stats();
     void compute_mean();
