@@ -16,6 +16,7 @@ class GEM {
 private:
     Eigen::MatrixXd S1;
     Eigen::MatrixXd S2;
+    Eigen::VectorXd baseline_distances;
     int N, N1, N2;   // set partition dimensions
     float partition; // N1 should be 15% of N
     double alpha;    // outlier detection hyperparameter
@@ -34,8 +35,13 @@ public:
 
     Eigen::MatrixXd getS1();
     Eigen::MatrixXd getS2();
+    Eigen::MatrixXd getBaselineDistances();
 
     Eigen::MatrixXd random_permutation(Eigen::MatrixXd X, bool columns=true, bool index_check=true);
+
+    void kNN(bool strict_k=false) {
+
+    Eigen::VectorXd get_k_best(Eigen::VectorXd neighbors);
 
     double CUSUM();
 
@@ -45,6 +51,4 @@ public:
 
     // return true if anomaly found
     bool online_detection();
-
-    std::tuple<Eigen::MatrixXd, Eigen::MatrixXd> partition_set(Eigen::MatrixXd dataset);
 };

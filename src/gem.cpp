@@ -41,14 +41,15 @@ void GEM::partition_data(Eigen::MatrixXd X) {
     
     assert(X.rows() == this->p); // feature dimension must be on the y axis
 
-    this->N = X.cols();
+    this->N  = X.cols();
     this->N1 = (int)(this->N*this->partition);
     this->N1 = (this->N1 <= 0) ? 1 : this->N1;
     this->N2 = this->N - this->N1;
 
-    S1.resize(this->p,this->N1);
-    S2.resize(this->p,this->N2);
-
+    this->S1.resize(this->p,this->N1);
+    this->S2.resize(this->p,this->N2);
+    this->baseline_distances.resize(this->N2);
+    this->baseline_distances.setZero();
 
     // Don't forget the random shuffle!!
     Eigen::MatrixXd X_perm = GEM::random_permutation(X);
@@ -141,3 +142,47 @@ Eigen::MatrixXd GEM::getS1() {
 Eigen::MatrixXd GEM::getS2() {
     return this->S2;
 }
+/** 
+ * Returns the baseline distances.
+ * Don't forget to compute them in the OFFLINE phase!!
+*/
+Eigen::MatrixXd GEM::getBaselineDistances() {
+    return this->baseline_distances;
+}
+
+/**
+ * Computes the k Nearest Neighbors of the set S2 in the set S1.
+ * if strict_k = true  it will return an error if the set S1 doesn't have enough neighbors
+ * else                it will compute the baseline with less than k neighbors if S1 is small
+*/
+void GEM::kNN(bool strict_k/*=false*/) {
+    // if these fail, you need to call GEM::partition_data(X) before kNN()!!
+    assert((this->N == (this->N1 + this->N2)));
+    assert(this->baseline_distances.size() == this->N2);
+    assert(this->S1.cols() == this->N1);
+    assert(this->S2.cols() == this->N2);
+    // not enough elements in the set to compute the k neighbors
+    assert((this->k <= this->N1) || !(strict_k));
+
+    Eigen::MatrixXd S1_sample, S2_sample;
+    Eigen::VectorXd tmp_distances(this->N1);
+    double dist, k_sum;
+    int i, j;
+    for (i = 0; i < this->N2; i++) {
+        // compute distances
+        S2_sample = this->S2.col(i);
+        tmp_distances.setZero();
+        for (j = 0; j < this->N1; j++) {
+            S1_sample = this->S1.col(j);
+            dist = GEM::euclidean_dist(S1_sample,S2_sample);
+            tmp_distances(j) = dist;
+        }
+        // sum the best k neighbors
+        std::sort(tmp_distances.begin(), tmp_distances.end());
+        k_sum = 0;
+        for (j = 0; (j < this->k) && (j < this->N1); j++) { k_sum += tmp_distances(j); }
+        // store value
+        this->baseline_distances(i) = k_sum;
+    }
+} /* kNN */
+
