@@ -60,22 +60,14 @@ int main()
     int tau = 10; // change-point (when the anomaly begins)
 
     // the model is unkown so must be simulated as i.i.d. variables
-    // decide what significant statistics need to be taken
 
     int N = 10; // number of samples in the nominal data set (data guaranteed to have no anomalies)
-    // need a way to get the nominal dataset
-    GEM gem(p);
-    
+
+    // testing area 
     Eigen::MatrixXd X = random_dataset(p, N, true/*gaussian*/);
-    Eigen::VectorXd old_baselines;
 
-    gem.partition_data(X); gem.kNN();
-    old_baselines = gem.getBaselineDistances();
-    gem.save_baseline();
-    gem.load_baseline();
-
-    std::cout << "Baseline in RAM: " << std::endl << old_baselines << std::endl;
-    std::cout << "Baseline LOADED: " << std::endl << gem.getBaselineDistances() << std::endl;
+    GEM gem(p);
+    gem.offline_phase(X);
 
     return 0;
 } /* main */

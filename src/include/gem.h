@@ -26,13 +26,13 @@ private:
     double h;        // anomaly detection threshold
     
 public:
-    GEM(int p, int k=4,double alpha=2.0, double h=5.0,float partition=0.15);
+    GEM(int p, int k=4, double alpha=2.0, double h=5.0);
 
     double euclidean_dist(Eigen::VectorXd p1, Eigen::VectorXd p2);
 
     double ReLU(double x);
 
-    void partition_data(Eigen::MatrixXd X);
+    void partition_data(Eigen::MatrixXd X, float partition=0.15);
 
     Eigen::MatrixXd getS1();
     Eigen::MatrixXd getS2();
@@ -49,7 +49,7 @@ public:
 
     double tail_probability();
 
-    void offline_phase();
+    void offline_phase(Eigen::MatrixXd X, float partition=0.15, bool strict_k=false, bool save_file=true, std::string file_path="./baseline_distances.csv");
 
     // return true if anomaly found
     bool online_detection();

@@ -3,19 +3,16 @@
 /**
  * Constructor
 */
-GEM::GEM(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/,float partition/*=0.15*/) {
-    assert((partition>0.0) && (partition<1.0));
+GEM::GEM(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/) {
+    
     assert((k>0) && (alpha>0) && (h>0));
     assert(p>0);
     this->k = k;
     this->alpha = alpha;
     this->h = h;
-    this->partition = partition;
-    // Offline Phase 
-    // Partition dataset
-    // calculate sum kNN for each yj in S1 for each xj in S2
-    // sort dj vector in ascending order
     this->p = p;
+    // Offline Phase 
+    // Online Phase
 } /* GEM */
 
 /** 
@@ -37,10 +34,12 @@ double GEM::ReLU(double x) {
  * Given the set of nominal datapoints, randomly partitions the data in the two sets S1 and S2.
  * TODO: find better way of randomly selecting samples, like generating M uniformly random indexes to define one of the two partitions?
 */
-void GEM::partition_data(Eigen::MatrixXd X) {
+void GEM::partition_data(Eigen::MatrixXd X, float partition/*=0.15*/) {
     
     assert(X.rows() == this->p); // feature dimension must be on the y axis
-
+    assert((partition>0.0) && (partition<1.0));
+    
+    this->partition = partition;
     this->N  = X.cols();
     this->N1 = (int)(this->N*this->partition);
     this->N1 = (this->N1 <= 0) ? 1 : this->N1;
@@ -221,4 +220,26 @@ void GEM::load_baseline(std::string file_path/*="./baseline_distances.csv"*/) {
 	// here we conver the vector variable into the matrix and return the resulting object, 
 	// note that values.data() is the pointer to the first memory location at which the entries of the vector matrixEntries are stored;
 	this->baseline_distances = Eigen::Map<Eigen::Vector<double, Eigen::Dynamic>> (values.data(), values.size());
+} /* load_baseline */
+
+/**
+ * The whole offline phase of the GEM model.
+*/
+void GEM::offline_phase(Eigen::MatrixXd X, float partition/*=0.15*/,
+                    bool strict_k/*=false*/, bool save_file/*=true*/, 
+                    std::string file_path/*="./baseline_distances.csv"*/) {
+    // sanity check
+    assert(X.rows() == this->p);
+
+    GEM::partition_data(X, partition);
+    GEM::kNN(strict_k);
+    if (save_file) { GEM::save_baseline(file_path); }
+}
+
+bool GEM::online_detection() {
+
+    bool anomaly_found = false;
+
+
+    return anomaly_found;
 }
