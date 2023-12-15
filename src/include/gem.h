@@ -39,7 +39,7 @@ public:
 
     Eigen::MatrixXd random_permutation(Eigen::MatrixXd X, bool columns=true, bool index_check=true);
 
-    void kNN(bool strict_k=false) {
+    void kNN(bool strict_k=false);
 
     Eigen::VectorXd get_k_best(Eigen::VectorXd neighbors);
 

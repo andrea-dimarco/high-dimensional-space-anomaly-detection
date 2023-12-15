@@ -16,7 +16,7 @@
  * Generate a matrix of random values given 5 parameters
  * Dimension on x axis,
  * Dimension on y axis,
- * is_uniform (if false then it will be Gaussian)
+ * is_uniform use a uniform distribution (otherwisen it will be Gaussian)
  * lower_bound (or mean)
  * upper_bound (or standard deviation)
  * seed (the seed for the rasndom generator)
@@ -67,11 +67,6 @@ int main()
     GEM gem(p);
     
     Eigen::MatrixXd X = random_dataset(p, N, true/*gaussian*/);
-    
-    gem.partition_data(X);
-    gem.kNN();
-
-    std::cout << gem.getBaselineDistances() << std::endl;
 
     return 0;
 } /* main */
