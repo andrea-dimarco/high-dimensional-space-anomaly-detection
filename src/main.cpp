@@ -53,7 +53,7 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
-    int p = 5; // output dimension
+    int p = 1; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.
 
@@ -62,11 +62,20 @@ int main()
     // the model is unkown so must be simulated as i.i.d. variables
     // decide what significant statistics need to be taken
 
-    int N = 20; // number of samples in the nominal data set (data guaranteed to have no anomalies)
+    int N = 10; // number of samples in the nominal data set (data guaranteed to have no anomalies)
     // need a way to get the nominal dataset
     GEM gem(p);
     
     Eigen::MatrixXd X = random_dataset(p, N, true/*gaussian*/);
+    Eigen::VectorXd old_baselines;
+
+    gem.partition_data(X); gem.kNN();
+    old_baselines = gem.getBaselineDistances();
+    gem.save_baseline();
+    gem.load_baseline();
+
+    std::cout << "Baseline in RAM: " << std::endl << old_baselines << std::endl;
+    std::cout << "Baseline LOADED: " << std::endl << gem.getBaselineDistances() << std::endl;
 
     return 0;
 } /* main */

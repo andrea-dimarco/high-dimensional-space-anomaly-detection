@@ -10,6 +10,7 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <Eigen/src/Core/Map.h>
+#include <fstream>
 
 class GEM {
 
@@ -41,7 +42,8 @@ public:
 
     void kNN(bool strict_k=false);
 
-    Eigen::VectorXd get_k_best(Eigen::VectorXd neighbors);
+    void save_baseline(std::string file_path="./baseline_distances.csv");
+    void load_baseline(std::string file_path="./baseline_distances.csv");
 
     double CUSUM();
 

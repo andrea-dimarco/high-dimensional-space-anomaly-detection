@@ -186,3 +186,39 @@ void GEM::kNN(bool strict_k/*=false*/) {
     }
 } /* kNN */
 
+/**
+ * Save the computed baseline in a .csv file
+*/
+void GEM::save_baseline(std::string file_path/*="./baseline_distances.csv"*/) {
+    
+    const Eigen::IOFormat CSVFormat(Eigen::FullPrecision, Eigen::DontAlignCols, ", ", "\n");
+
+	std::ofstream save_file(file_path);
+	if (save_file.is_open()) {
+		save_file << this->baseline_distances.format(CSVFormat);
+		save_file.close();
+	}
+} /* save_baseline */
+/**
+ * Load the previously computed baselines from a csv file
+*/
+void GEM::load_baseline(std::string file_path/*="./baseline_distances.csv"*/) {
+    std::vector<double> values;
+	
+	std::ifstream load_file(file_path); // store the data from the matrix
+	std::string row_string; // store the row of the matrix that contains commas 
+	std::string value; // store the matrix entry
+
+	while (std::getline(load_file, row_string)) // here we read a row by row of matrixDataFile and store every line into the string variable matrixRowString
+	{
+		std::stringstream row_stream(row_string); //convert matrixRowString that is a string to a stream variable.
+
+		while (std::getline(row_stream, value, ',')) // here we read pieces of the stream row_stream until every comma, and store the resulting character into the matrixEntry
+		{
+			values.push_back(std::stod(value));   //here we convert the string to double and fill in the row vector storing all the matrix entries
+		}
+	}
+	// here we conver the vector variable into the matrix and return the resulting object, 
+	// note that values.data() is the pointer to the first memory location at which the entries of the vector matrixEntries are stored;
+	this->baseline_distances = Eigen::Map<Eigen::Vector<double, Eigen::Dynamic>> (values.data(), values.size());
+}
