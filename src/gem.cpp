@@ -24,7 +24,7 @@ double GEM::euclidean_dist(Eigen::VectorXd p1, Eigen::VectorXd p2) {
 } /* euclidean_dist */
 
 /** Performs the ReLU function on the given input.
- * Which is max(0, x)
+ * Which is max(0, x) (Just use std::clamp(x,0,x))
 */
 double GEM::ReLU(double x) {
     if (x < 0.0) { return 0.0; }
