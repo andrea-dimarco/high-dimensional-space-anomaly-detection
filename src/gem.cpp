@@ -44,6 +44,8 @@ void GEM::partition_data(Eigen::MatrixXd X) {
     S2.resize(this->N2,this->p);
 
     // Don't forget the random shuffle!!
+    // do we really have to permute to produce the 2 partitions?
+    // what about generating M uniformly random indexes to define one of the two partitions?
     Eigen::MatrixXd X_perm = GEM::random_permutation(X);
 
     int i, j, l;
