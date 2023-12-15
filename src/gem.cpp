@@ -1,5 +1,8 @@
 #include "include/gem.h"
 
+/**
+ * Constructor
+*/
 GEM::GEM(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/,float partition/*=0.15*/) {
     assert((partition>0.0) && (partition<1.0));
     assert((k>0) && (alpha>0) && (h>0));
@@ -15,8 +18,8 @@ GEM::GEM(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/,float partiti
     this->p = p;
 } /* GEM */
 
-/** Given two vectors, returns the euclidean distance between them.
- * 
+/** 
+ * Given two vectors, returns the euclidean distance between them.
 */
 double GEM::euclidean_dist(Eigen::VectorXd p1, Eigen::VectorXd p2) {
     assert(p1.size() == p2.size());
@@ -24,41 +27,40 @@ double GEM::euclidean_dist(Eigen::VectorXd p1, Eigen::VectorXd p2) {
 } /* euclidean_dist */
 
 /** Performs the ReLU function on the given input.
- * Which is max(0, x) (Just use std::clamp(x,0,x))
+ * Which is max(0, x)
 */
 double GEM::ReLU(double x) {
-    if (x < 0.0) { return 0.0; }
-    else { return x; }
+    return std::clamp(x, 0.0, x);
 } /* ReLU */
 
 /**
- * Given the set of nominal datapoints, partitions the data in the two sets S1 and S2.
- * TODO: implement the random shuffle
+ * Given the set of nominal datapoints, randomly partitions the data in the two sets S1 and S2.
+ * TODO: find better way of randomly selecting samples, like generating M uniformly random indexes to define one of the two partitions?
 */
 void GEM::partition_data(Eigen::MatrixXd X) {
     
-    assert(X.cols() == this->p); // feature dimension must be on the y axis
+    assert(X.rows() == this->p); // feature dimension must be on the y axis
 
-    this->N = X.rows();
+    this->N = X.cols();
     this->N1 = (int)(this->N*this->partition);
+    this->N1 = (this->N1 <= 0) ? 1 : this->N1;
     this->N2 = this->N - this->N1;
 
-    S1.resize(this->N1,this->p);
-    S2.resize(this->N2,this->p);
+    S1.resize(this->p,this->N1);
+    S2.resize(this->p,this->N2);
+
 
     // Don't forget the random shuffle!!
-    // do we really have to permute to produce the 2 partitions?
-    // what about generating M uniformly random indexes to define one of the two partitions?
     Eigen::MatrixXd X_perm = GEM::random_permutation(X);
 
     int i, j, l;
     i = 0;
     for (j = 0; i < N1; j++) {
-        S1.row(j) = X_perm.row(i);
+        S1.col(j) = X_perm.col(i);
         i++;
     }
     for (l = 0; l < N2; l++) {
-        S2.row(l) = X_perm.row(i);
+        S2.col(l) = X_perm.col(i);
         i++;
     }
     assert(i == N); // we got every element
@@ -126,3 +128,16 @@ Eigen::MatrixXd GEM::random_permutation(Eigen::MatrixXd X, bool columns/*=true*/
     }
     return X_perm;
 } /* random_permutation */
+
+/** 
+ * Returns S1
+*/
+Eigen::MatrixXd GEM::getS1() {
+    return this->S1;
+}
+/** 
+ * Returns S2
+*/
+Eigen::MatrixXd GEM::getS2() {
+    return this->S2;
+}

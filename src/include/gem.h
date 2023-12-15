@@ -32,6 +32,9 @@ public:
 
     void partition_data(Eigen::MatrixXd X);
 
+    Eigen::MatrixXd getS1();
+    Eigen::MatrixXd getS2();
+
     Eigen::MatrixXd random_permutation(Eigen::MatrixXd X, bool columns=true, bool index_check=true);
 
     double CUSUM();
