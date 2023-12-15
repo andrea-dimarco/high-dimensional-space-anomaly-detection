@@ -8,7 +8,10 @@ GEM::GEM(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/,float partiti
     this->alpha = alpha;
     this->h = h;
     this->partition = partition;
-
+    // Offline Phase 
+    // Partition dataset
+    // calculate sum kNN for each yj in S1 for each xj in S2
+    // sort dj vector in ascending order
     this->p = p;
 } /* GEM */
 
