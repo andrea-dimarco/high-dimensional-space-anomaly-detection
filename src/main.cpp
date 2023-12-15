@@ -26,8 +26,11 @@ int main()
     // decide what significant statistics need to be taken
 
     int N = 5; // number of samples in the nominal data set (data guaranteed to have no anomalies)
-
+    // need a way to get the nominal dataset
     GEM gem(p);
+    
+    
+    
 
     return 0;
 } /* main */
