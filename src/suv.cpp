@@ -166,7 +166,7 @@ void SUV::save_data(std::string A_file_path, std::string B_file_path,
 /**
  * Generate an Eigen matrix out of a previously populated file from the save_data() function
 */
-Eigen::MatrixXd SUV::open_data(std::string file_path, bool is_output /*=false*/) {
+Eigen::MatrixXd SUV::open_data(std::string file_path, bool is_output/*=false*/) {
 	
 	// the input is the file: "fileToOpen.csv":
 	// a,b,c
