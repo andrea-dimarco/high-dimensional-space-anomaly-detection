@@ -3,11 +3,12 @@
 /**
  * Constructor
 */
-PCA::PCA(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/) {
+PCA::PCA(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/,float partition) {
     
     assert((k>0) && (alpha>0) && (h>0));
     assert(p>0);
     this->k = k;
+    this->partition = partition;
     this->alpha = alpha;
     this->h = h;
     this->p = p;
@@ -18,21 +19,19 @@ PCA::PCA(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/) {
 /** 
  * Given two vectors, returns the euclidean distance between them.
 */
-double PCA::euclidean_dist(Eigen::VectorXd p1, Eigen::VectorXd p2) {
-    assert(p1.size() == p2.size());
-    return sqrt((p1-p2).dot((p1-p2)));
+double PCA::l2_norm(Eigen::VectorXd p1) {
+    assert(p1.size() > 0);
+    return p1.squaredNorm();
 } /* euclidean_dist */
 
 /**
- * Given the set of nominal datapoints, randomly partitions the data in the two sets S1 and S2.
- * TODO: find better way of randomly selecting samples, like generating M uniformly random indexes to define one of the two partitions?
+ * Given the set of nominal datapoints, divides data in two subsets S1 and S2 
+ * with sizes N1 and N2 = |X| - N1 where N1 is a percentage of X
 */
-void PCA::partition_data(Eigen::MatrixXd X, float partition/*=0.15*/) {
+void PCA::divide_nominal_dataset(Eigen::MatrixXd X, float partition) {
     
     assert(X.rows() == this->p); // feature dimension must be on the y axis
-    assert((partition>0.0) && (partition<1.0));
     
-    this->partition = partition;
     this->N  = X.cols();
     this->N1 = (int)(this->N*this->partition);
     this->N1 = (this->N1 <= 0) ? 1 : this->N1;
@@ -43,84 +42,47 @@ void PCA::partition_data(Eigen::MatrixXd X, float partition/*=0.15*/) {
     this->baseline_distances.resize(this->N2);
     this->baseline_distances.setZero();
 
-    // Don't forget the random shuffle!!
-    Eigen::MatrixXd X_perm = PCA::random_permutation(X);
+    this->baseline_mean_vector = S1.colwise().mean(); // Is this colwise or rowwise? Must check!
 
-    int i, j, l;
-    i = 0;
-    for (j = 0; i < N1; j++) {
-        S1.col(j) = X_perm.col(i);
+    Eigen::MatrixXd X_perm = X;
+    // TODO: generate N1 random indexes from |X| elements
+
+    // set values of S1 and S2
+    // For now we just split the data and S1 gets the first N1 elements of N
+    for (int i = 0; i < N; i++) {
+        if (i < N1) {
+            S1.col(i) = X_perm.col(i);
+        }
+        else {
+            S2.col(i - N1) = X_perm.col(i);
+        }
         i++;
     }
-    for (l = 0; l < N2; l++) {
-        S2.col(l) = X_perm.col(i);
-        i++;
-    }
-    assert(i == N); // we got every element
+
 } /* partition_data */
 
 /**
- * Randomly permutates either the columns or the rows of the given matrix.
- * Depending on the assignment of the boolean variable columns:
- *  columns = true  -> permutates columns
- *  columns = false -> permutate rows
- * Also:
- *  index_check = true  -> will NEVER try to swap the column with itself
- *  index_check = false -> might swap the column with itseld (so no swap)
+ * Computes the covariance matrix given the datapoints from S1 and the sample mean
+ * Should we trust stackoverflow?
+ * https://stackoverflow.com/questions/15138634/eigen-is-there-an-inbuilt-way-to-calculate-sample-covariance
 */
-Eigen::MatrixXd PCA::random_permutation(Eigen::MatrixXd X, bool columns/*=true*/, bool index_check/*=true*/) {
-    // Sanity check
-    if (columns) {
-        if (X.cols() == 1) {
-            std::cout << "Are you kidding me??" << std::endl;
-            return X;
-        }
-    } else {
-        if (X.rows() == 1) {
-            std::cout << "Are you kidding me??" << std::endl;
-            return X;
-        }
-    }
+void PCA::compute_covariance_matrix() {
+    Eigen::MatrixXd centered = S2.rowwise() - baseline_mean_vector;
+    this->covariance_matrix = (centered.adjoint() * centered) / double(S2.rows() - 1);
+} /* covariance matrix computation*/
 
-    // Define a PRG
-    std::default_random_engine engine(0);
-    std::bernoulli_distribution bernoulli;
-    Eigen::MatrixXd X_perm = X;
-    int i, swap_index;
-    Eigen::MatrixXd tmp;
-
-    // Permutate
-    if (columns) {
-        std::uniform_int_distribution<> uniform_cols(0, X.cols()-1);
-        // randomly permutate columns
-        for (i = 0; i < X.cols(); i++) {
-            if (bernoulli(engine)) {
-                // swap column with another random column
-                do {
-                    swap_index = uniform_cols(engine);
-                } while((swap_index == i) && index_check); // don't swap the vector with itself!!
-                tmp = X_perm.col(i);
-                X_perm.col(i) = X_perm.col(swap_index);
-                X_perm.col(swap_index) = tmp;
-            }
-        }
-    } else {
-        std::uniform_int_distribution<> uniform_rows(0, X.rows()-1);
-        // randomly permutate rows
-        for (i = 0; i < X.rows(); i++) {
-            if (bernoulli(engine)) {
-                // swap column with another random column
-                do {
-                    swap_index = uniform_rows(engine);
-                } while((swap_index == i) && index_check); // don't swap the vector with itself!!
-                tmp = X_perm.row(i);
-                X_perm.row(i) = X_perm.row(swap_index);
-                X_perm.row(swap_index) = tmp;
-            }
-        }
-    }
-    return X_perm;
-} /* random_permutation */
+/**
+ * Computes summary statistics of the PCA based algorithm 
+ * i.e. the set of the l2 of the residual terms for each datapoint in S2
+ * 
+*/
+void PCA::compute_summary_statistics() {
+    // for each datapoint in s2 
+        // compute rj 
+        //compute the norm of rj
+    // sort r_set in ascending order
+    // assign to object vector
+}
 
 /** 
  * Returns S1
@@ -141,42 +103,6 @@ Eigen::MatrixXd PCA::getS2() {
 Eigen::MatrixXd PCA::getBaselineDistances() {
     return this->baseline_distances;
 }
-
-/**
- * Computes the k Nearest Neighbors of the set S2 in the set S1.
- * if strict_k = true  it will return an error if the set S1 doesn't have enough neighbors
- * else                it will compute the baseline with less than k neighbors if S1 is small
-*/
-void PCA::kNN(bool strict_k/*=false*/) {
-    // if these fail, you need to call PCA::partition_data(X) before kNN()!!
-    assert((this->N == (this->N1 + this->N2)));
-    assert(this->baseline_distances.size() == this->N2);
-    assert(this->S1.cols() == this->N1);
-    assert(this->S2.cols() == this->N2);
-    // not enough elements in the set to compute the k neighbors
-    assert((this->k <= this->N1) || !(strict_k));
-
-    Eigen::MatrixXd S1_sample, S2_sample;
-    Eigen::VectorXd tmp_distances(this->N1);
-    double dist, k_sum;
-    int i, j;
-    for (i = 0; i < this->N2; i++) {
-        // compute distances
-        S2_sample = this->S2.col(i);
-        tmp_distances.setZero();
-        for (j = 0; j < this->N1; j++) {
-            S1_sample = this->S1.col(j);
-            dist = PCA::euclidean_dist(S1_sample,S2_sample);
-            tmp_distances(j) = dist;
-        }
-        // sum the best k neighbors
-        std::sort(tmp_distances.begin(), tmp_distances.end());
-        k_sum = 0;
-        for (j = 0; (j < this->k) && (j < this->N1); j++) { k_sum += tmp_distances(j); }
-        // store value
-        this->baseline_distances(i) = k_sum;
-    }
-} /* kNN */
 
 /**
  * Save the computed baseline in a .csv file
@@ -218,18 +144,17 @@ void PCA::load_baseline(std::string file_path/*="./baseline_distances.csv"*/) {
 /**
  * The whole offline phase of the PCA model.
 */
-void PCA::offline_phase(Eigen::MatrixXd X, float partition/*=0.15*/,
+void PCA::offline_phase(Eigen::MatrixXd X,
                     bool strict_k/*=false*/, bool save_file/*=true*/, 
                     std::string file_path/*="./baseline_distances.csv"*/) {
     // sanity check
     assert(X.rows() == this->p);
 
-    PCA::partition_data(X, partition);
-    PCA::kNN(strict_k);
+    PCA::divide_nominal_dataset(X, partition);
     if (save_file) { PCA::save_baseline(file_path); }
 }
 
-bool PCA::online_detection() {
+bool PCA::online_detection(Eigen::VectorXd sample) {
 
     bool anomaly_found = false;
 
