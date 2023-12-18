@@ -19,14 +19,14 @@ private:
     Eigen::MatrixXd S2;
     Eigen::VectorXd baseline_distances;
     int N, N1, N2;   // set partition dimensions
-    float partition; // N1 should be 15% of N
+    double g;        // current level of outliers detected 
     double alpha;    // outlier detection hyperparameter
     int p;           // dimensionality of the space
     int k;           // neighbors to consider
     double h;        // anomaly detection threshold
     
 public:
-    GEM(int p, int k=4, double alpha=2.0, double h=5.0);
+    GEM(int p, int k=4, double alpha=0.2, double h=5.0);
 
     double euclidean_dist(Eigen::VectorXd p1, Eigen::VectorXd p2);
 
@@ -34,23 +34,25 @@ public:
 
     void partition_data(Eigen::MatrixXd X, float partition=0.15);
 
-    Eigen::MatrixXd getS1();
-    Eigen::MatrixXd getS2();
-    Eigen::MatrixXd getBaselineDistances();
+    Eigen::MatrixXd get_S1();
+    Eigen::MatrixXd get_S2();
+    Eigen::MatrixXd get_baseline_distances();
+
+    void reset_g();
+    void set_h(double h);
+    void set_alpha(double alpha);
 
     Eigen::MatrixXd random_permutation(Eigen::MatrixXd X, bool columns=true, bool index_check=true);
 
-    void kNN(bool strict_k=false);
+    void kNN();
 
     void save_baseline(std::string file_path="./baseline_distances.csv");
     void load_baseline(std::string file_path="./baseline_distances.csv");
 
-    double CUSUM();
+    int characteristic_function(Eigen::VectorXd v, double scalar);
 
-    double tail_probability();
-
-    void offline_phase(Eigen::MatrixXd X, float partition=0.15, bool strict_k=false, bool save_file=true, std::string file_path="./baseline_distances.csv");
+    void offline_phase(Eigen::MatrixXd X, float partition=0.15, bool save_file=true, std::string file_path="./baseline_distances.csv");
 
     // return true if anomaly found
-    bool online_detection();
+    bool online_detection(Eigen::VectorXd sample);
 };

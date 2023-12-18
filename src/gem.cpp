@@ -3,7 +3,7 @@
 /**
  * Constructor
 */
-GEM::GEM(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/) {
+GEM::GEM(int p, int k/*=4*/,double alpha/*=0.2*/, double h/*=5.0*/) {
     
     assert((k>0) && (alpha>0) && (h>0));
     assert(p>0);
@@ -11,7 +11,8 @@ GEM::GEM(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/) {
     this->alpha = alpha;
     this->h = h;
     this->p = p;
-    // Offline Phase 
+    this->g = 0.0;
+    
     // Online Phase
 } /* GEM */
 
@@ -39,9 +40,8 @@ void GEM::partition_data(Eigen::MatrixXd X, float partition/*=0.15*/) {
     assert(X.rows() == this->p); // feature dimension must be on the y axis
     assert((partition>0.0) && (partition<1.0));
     
-    this->partition = partition;
     this->N  = X.cols();
-    this->N1 = (int)(this->N*this->partition);
+    this->N1 = (int)(this->N*partition);
     this->N1 = (this->N1 <= 0) ? 1 : this->N1;
     this->N2 = this->N - this->N1;
 
@@ -132,21 +132,31 @@ Eigen::MatrixXd GEM::random_permutation(Eigen::MatrixXd X, bool columns/*=true*/
 /** 
  * Returns S1
 */
-Eigen::MatrixXd GEM::getS1() {
+Eigen::MatrixXd GEM::get_S1() {
     return this->S1;
 }
 /** 
  * Returns S2
 */
-Eigen::MatrixXd GEM::getS2() {
+Eigen::MatrixXd GEM::get_S2() {
     return this->S2;
 }
 /** 
  * Returns the baseline distances.
  * Don't forget to compute them in the OFFLINE phase!!
 */
-Eigen::MatrixXd GEM::getBaselineDistances() {
+Eigen::MatrixXd GEM::get_baseline_distances() {
     return this->baseline_distances;
+}
+
+void GEM::reset_g() {
+    this->g = 0.0;
+}
+void GEM::set_h(double h) {
+    this->h = h;
+}
+void GEM::set_alpha(double alpha) {
+    this->alpha = alpha;
 }
 
 /**
@@ -154,14 +164,12 @@ Eigen::MatrixXd GEM::getBaselineDistances() {
  * if strict_k = true  it will return an error if the set S1 doesn't have enough neighbors
  * else                it will compute the baseline with less than k neighbors if S1 is small
 */
-void GEM::kNN(bool strict_k/*=false*/) {
+void GEM::kNN() {
     // if these fail, you need to call GEM::partition_data(X) before kNN()!!
     assert((this->N == (this->N1 + this->N2)));
     assert(this->baseline_distances.size() == this->N2);
     assert(this->S1.cols() == this->N1);
     assert(this->S2.cols() == this->N2);
-    // not enough elements in the set to compute the k neighbors
-    assert((this->k <= this->N1) || !(strict_k));
 
     Eigen::MatrixXd S1_sample, S2_sample;
     Eigen::VectorXd tmp_distances(this->N1);
@@ -226,20 +234,63 @@ void GEM::load_baseline(std::string file_path/*="./baseline_distances.csv"*/) {
  * The whole offline phase of the GEM model.
 */
 void GEM::offline_phase(Eigen::MatrixXd X, float partition/*=0.15*/,
-                    bool strict_k/*=false*/, bool save_file/*=true*/, 
-                    std::string file_path/*="./baseline_distances.csv"*/) {
+                    bool save_file/*=true*/, std::string file_path/*="./baseline_distances.csv"*/) {
     // sanity check
     assert(X.rows() == this->p);
 
-    GEM::partition_data(X, partition);
-    GEM::kNN(strict_k);
+    GEM::partition_data(X, partition); // returns S1, S2
+    GEM::kNN();// takes S1, S2 in input
     if (save_file) { GEM::save_baseline(file_path); }
-}
+} /* offline_phase */
 
-bool GEM::online_detection() {
+/**
+ * Counts the amount of element in the vector v that are greater than scalar
+*/
+int GEM::characteristic_function(Eigen::VectorXd v, double scalar) {
+    int result = 0;
+    for(int i = 0; i < v.size(); i++) {
+        if (v(i) >= scalar) {
+            result++;
+        }
+    }
+    return result;
+} /* characteristic_function */
+
+/**
+ * One-step online analysis for anomalies.
+*/
+bool GEM::online_detection(Eigen::VectorXd sample) {
 
     bool anomaly_found = false;
+    Eigen::VectorXd S1_sample;
+    Eigen::VectorXd tmp_distances(this->N1);
+    double dist, k_sum, tail_probability;
+    int i;
 
+    for (i = 0; i < this->N1; i++) {
+        S1_sample = this->S1.col(i);
+        dist = GEM::euclidean_dist(sample, S1_sample);
+        tmp_distances(i) = dist;
+    }
+     // sum the best k neighbors
+    std::sort(tmp_distances.begin(), tmp_distances.end());
+    k_sum = 0;
+    for (i = 0; (i < this->k) && (i < this->N1); i++) { k_sum += tmp_distances(i); }
 
+    // compute probability
+    tail_probability = ((double)characteristic_function(this->baseline_distances, k_sum)) / N2;
+    if (tail_probability == 0.0) {
+        tail_probability = (double) 1 / N2;
+    }
+
+    // CUSUM
+    this->g += log(this->alpha / tail_probability);
+
+    // anomaly check
+    if (this->g >= this->h) {
+        anomaly_found = true;
+    } else {
+        anomaly_found = false;
+    }
     return anomaly_found;
-}
+} /* online_detection */

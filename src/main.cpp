@@ -53,7 +53,7 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
-    int p = 1; // output dimension
+    int p = 10; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.
 
@@ -61,13 +61,27 @@ int main()
 
     // the model is unkown so must be simulated as i.i.d. variables
 
-    int N = 10; // number of samples in the nominal data set (data guaranteed to have no anomalies)
+    int N = 100; // number of samples in the nominal data set (data guaranteed to have no anomalies)
 
     // testing area 
-    Eigen::MatrixXd X = random_dataset(p, N, true/*gaussian*/);
+    Eigen::MatrixXd X = random_dataset(p, N, false/*normal*/); // nominal dataset
+    Eigen::MatrixXd Z = random_dataset(p, N, false/*normal*/, 0.5, 1.0); // poisoned dataset
+
+    for (int i = 0; i < tau; i++) {
+        Z.col(i) = X.col(i);
+    }
+
+
 
     GEM gem(p);
     gem.offline_phase(X);
 
+    for (int i = 0; i < N; i++) {
+        if (gem.online_detection(Z.col(i))) {
+            std::cout << "Anomaly found with delay: " << (i-tau) << "!!" << std::endl;
+            return 0;
+        }
+    }
+    std::cout << "No anomaly found." << std::endl;
     return 0;
 } /* main */
