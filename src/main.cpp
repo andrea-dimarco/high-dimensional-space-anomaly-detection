@@ -86,12 +86,14 @@ int main()
     std::cout << "Anomalous samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
     std::cout << "Begin online phase..." << std::endl;
-    int perchentage;
+    int percentage;
     for (int i = 0; i < N; i++) {
-        perchentage = (int)((double)(i/N))*100;
-        if ( (perchentage % 10) == 0 ) {
-            std::cout << perchentage << "\% complete" << std::endl;
+        // progress notification
+        percentage = (int)((double)(i/N))*100;
+        if ( (percentage % 10) == 0 ) {
+            std::cout << percentage << "\% complete" << std::endl;
         }
+        // anomaly detection
         if (gem.online_detection(X.col(i))) {
             std::cout << "Anomaly found with delay: " << (i-tau) << "!!" << std::endl;
             return 0;
