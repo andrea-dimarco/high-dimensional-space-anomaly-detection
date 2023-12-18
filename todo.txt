@@ -5,4 +5,4 @@ TODO:
 - alternative random sampling
 - PCA offline
 - PCA online
-
+- verbosity of functions!!

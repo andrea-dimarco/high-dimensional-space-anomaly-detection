@@ -90,7 +90,7 @@ int main()
     for (int i = 0; i < N; i++) {
         perchentage = (int)((double)(i/N))*100;
         if ( (perchentage % 10) == 0 ) {
-            std::cout << perchentage << "% complete" << std::endl;
+            std::cout << perchentage << "\% complete" << std::endl;
         }
         if (gem.online_detection(X.col(i))) {
             std::cout << "Anomaly found with delay: " << (i-tau) << "!!" << std::endl;
