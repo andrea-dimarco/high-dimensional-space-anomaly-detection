@@ -2,3 +2,4 @@ TODO:
 - PCA offline
 - PCA online
 - verbosity? (do we really need it)
+- GEM does not recognize a change in the distriution!!

@@ -106,9 +106,11 @@ void GEM::set_alpha(double alpha) {
 */
 double GEM::kNN(Eigen::MatrixXd S2, bool is_offline/*=false*/) {
     // if these fail, you need to call GEM::partition_data(X) before kNN()!!
-    assert((this->N == (this->N1 + this->N2)));
-    assert(this->baseline_distances.size() == this->N2);
-    assert(this->S1.cols() == this->N1);
+    if (is_offline) {
+        assert((this->N == (this->N1 + this->N2)));
+        assert(this->baseline_distances.size() == this->N2);
+        assert(this->S1.cols() == this->N1);
+    }
     assert(S2.rows() == this->p);
 
     Eigen::MatrixXd S1_sample, S2_sample;

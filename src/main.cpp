@@ -54,7 +54,7 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
-    int p = 2; // output dimension
+    int p = 100; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.
 
@@ -62,7 +62,7 @@ int main()
 
     // the model is unkown so must be simulated as i.i.d. variables
 
-    int N = 3; // number of samples in the nominal data set (data guaranteed to have no anomalies)
+    int N = 1000; // number of samples in the nominal data set (data guaranteed to have no anomalies)
 
     // testing area
     std::clock_t start;
@@ -83,23 +83,23 @@ int main()
     gem.offline_phase(X);
     // duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     // std::cout<<"Duration: "<< duration << "s" << std::endl;
-    // std::cout << "Offline phase done!!" << std::endl;
+    std::cout << "Offline phase done!!" << std::endl;
 
     // // GEM Online phase
-    // X = random_dataset(p, N, false/*normal*/, 5.0, 1.1); // anomalous dataset
+    X = random_dataset(p, N, true/*uniform*/, -1.0, 0.0); // anomalous dataset
     // // X = suv.open_data("datasets/anomaly-human-activity.csv"); // anomaly!!
     // p = X.rows(); N = X.cols();
     // std::cout << "Anomalous samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
-    // std::cout << "Begin online phase..." << std::endl;
-    // gem.load_model();
-    // for (int i = 0; i < N; i++) {
-    //     // anomaly detection
-    //     if (gem.online_detection(X.col(i))) {
-    //         std::cout << "Anomaly found with delay: " << (i-tau) << "!!" << std::endl;
-    //         return 0;
-    //     }
-    // }
-    // std::cout << "No anomaly found." << std::endl;
+    std::cout << "Begin online phase..." << std::endl;
+    gem.load_model();
+    for (int i = 0; i < N; i++) {
+        // anomaly detection
+        if (gem.online_detection(X.col(i))) {
+            std::cout << "Anomaly found with delay: " << (i-tau) << "!!" << std::endl;
+            return 0;
+        }
+    }
+    std::cout << "No anomaly found." << std::endl;
     // return 0;
 } /* main */
