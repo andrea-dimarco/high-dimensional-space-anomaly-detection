@@ -3,17 +3,20 @@
 /**
  * Constructor
 */
-PCA::PCA(int p, float partition, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/) {
+PCA::PCA(int p, float partition_1/*=0.5*/, float partition_2/*=0.5*/,
+        float gamma/*=0.95*/, double alpha/*=2.0*/, double h/*=5.0*/) {
     
-    assert((k>0) && (alpha>0) && (h>0));
+    assert((gamma>0) && (alpha>0) && (h>0));
     assert(p>0);
-    this->k = k;
-    this->partition = partition;
-    this->alpha = alpha;
-    this->h = h;
     this->p = p;
     // Offline Phase 
+    this->partition_1 = partition_1;
+    this->partition_2 = partition_2;
+    this->gamma = gamma;
     // Online Phase
+    this->alpha = alpha;
+    this->h = h;
+    this->g = 0.0;
 } /* PCA */
 
 /** 
@@ -28,38 +31,48 @@ double PCA::l2_norm(Eigen::VectorXd p1) {
  * Given the set of nominal datapoints, divides data in two subsets S1 and S2 
  * with sizes N1 and N2 = |X| - N1 where N1 is a percentage of X
 */
-void PCA::divide_nominal_dataset(Eigen::MatrixXd X, float partition) {
+void PCA::compute_subsets(Eigen::MatrixXd X) {
     
     assert(X.rows() == this->p); // feature dimension must be on the y axis
     
     this->N  = X.cols();
-    this->N1 = (int)(this->N*this->partition);
+    this->N1 = (int)(this->N*this->partition_1);
     this->N1 = (this->N1 <= 0) ? 1 : this->N1;
-    this->N2 = this->N - this->N1;
+    this->N2 = (int)(this->N*this->partition_1);
+    this->N2 = (this->N2 <= 0) ? 1 : this->N2;
 
     this->S1.resize(this->p,this->N1);
     this->S2.resize(this->p,this->N2);
+
+    // Select random items
+    Eigen::VectorXd indexes(N);
+    for (int i = 0; i < N; i++) { indexes(i) = i; }
+
+    // Get S1 
+    std::random_shuffle(indexes.begin(), indexes.end());
+    for (int i = 0; i < N1; i++) { S1.col(i) = X.col(indexes(i)); }
+
+    // Get S2
+    std::random_shuffle(indexes.begin(), indexes.end());
+    for (int i = 0; i < N2; i++) { S2.col(i) = X.col(indexes(i)); }
+} /* cumpute_subsets */
+
+/**
+ * Determine the principal subspace using Xstat_PCA
+*/
+void PCA::compute_pca() {
     this->baseline_distances.resize(this->N2);
     this->baseline_distances.setZero();
 
-    this->baseline_mean_vector = S1.colwise().mean(); // Is this colwise or rowwise? Must check!
+    this->baseline_mean_vector = S1.colwise().mean(); // mean for every feature (column wise)
+}
 
-    Eigen::MatrixXd X_perm = X;
-    // TODO: generate N1 random indexes from |X| elements
+/**
+ * Compute baseline distances (residual magnitudes) using X_2 and the principal subspace
+*/
+void PCA::compute_baseline_distances() {
 
-    // set values of S1 and S2
-    // For now we just split the data and S1 gets the first N1 elements of N
-    for (int i = 0; i < N; i++) {
-        if (i < N1) {
-            S1.col(i) = X_perm.col(i);
-        }
-        else {
-            S2.col(i - N1) = X_perm.col(i);
-        }
-        i++;
-    }
-
-} /* partition_data */
+}
 
 /**
  * Computes the covariance matrix given the datapoints from S1 and the sample mean
@@ -67,8 +80,9 @@ void PCA::divide_nominal_dataset(Eigen::MatrixXd X, float partition) {
  * https://stackoverflow.com/questions/15138634/eigen-is-there-an-inbuilt-way-to-calculate-sample-covariance
 */
 void PCA::compute_covariance_matrix() {
-    Eigen::MatrixXd centered = S2.rowwise() - baseline_mean_vector;
-    this->covariance_matrix = (centered.adjoint() * centered) / double(S2.rows() - 1);
+    Eigen::MatrixXd centered;
+    centered = this->S1.rowwise() - this->baseline_mean_vector;
+    this->covariance_matrix = (centered.adjoint() * centered) / double(this->N1);
 } /* covariance matrix computation*/
 
 /**
@@ -87,20 +101,20 @@ void PCA::compute_summary_statistics() {
 /** 
  * Returns S1
 */
-Eigen::MatrixXd PCA::getS1() {
+Eigen::MatrixXd PCA::get_S1() {
     return this->S1;
 }
 /** 
  * Returns S2
 */
-Eigen::MatrixXd PCA::getS2() {
+Eigen::MatrixXd PCA::get_S2() {
     return this->S2;
 }
 /** 
  * Returns the baseline distances.
  * Don't forget to compute them in the OFFLINE phase!!
 */
-Eigen::MatrixXd PCA::getBaselineDistances() {
+Eigen::MatrixXd PCA::get_baseline_distances() {
     return this->baseline_distances;
 }
 
@@ -150,7 +164,7 @@ void PCA::offline_phase(Eigen::MatrixXd X,
     // sanity check
     assert(X.rows() == this->p);
 
-    PCA::divide_nominal_dataset(X, partition);
+    PCA::compute_subsets(X);
     if (save_file) { PCA::save_baseline(file_path); }
 }
 

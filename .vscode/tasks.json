@@ -12,7 +12,8 @@
                 "${fileDirname}/${fileBasenameNoExtension}",
                 
                 "${fileDirname}/gem.cpp",
-                "${fileDirname}/suv.cpp"
+                "${fileDirname}/suv.cpp",
+                "${fileDirname}/pca.cpp"
             ],
             "options": {
                 "cwd": "${fileDirname}"
