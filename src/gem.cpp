@@ -102,8 +102,9 @@ void GEM::set_alpha(double alpha) {
 
 /**
  * Computes the k Nearest Neighbors of the set S2 in the set S1.
+ * returns the last k_sum computed, this feature will be used in the online detection phase.
 */
-void GEM::kNN(Eigen::MatrixXd S2) {
+double GEM::kNN(Eigen::MatrixXd S2) {
     // if these fail, you need to call GEM::partition_data(X) before kNN()!!
     assert((this->N == (this->N1 + this->N2)));
     assert(this->baseline_distances.size() == this->N2);
@@ -113,13 +114,15 @@ void GEM::kNN(Eigen::MatrixXd S2) {
     Eigen::VectorXd tmp_distances(this->N1);
     double dist, k_sum;
     int i, j;
-    for (i = 0; i < this->N2; i++) {
+    for (i = 0; i < S2.cols(); i++) {
         // compute distances
         S2_sample = S2.col(i);
         tmp_distances.setZero();
+
+        
         for (j = 0; j < this->N1; j++) {
             S1_sample = this->S1.col(j);
-            dist = GEM::euclidean_dist(S1_sample,S2_sample);
+            dist = GEM::euclidean_dist(S1_sample, S2_sample);
             tmp_distances(j) = dist;
         }
         // sum the best k neighbors
@@ -129,6 +132,7 @@ void GEM::kNN(Eigen::MatrixXd S2) {
         // store value
         this->baseline_distances(i) = k_sum;
     }
+    return k_sum;
 } /* kNN */
 
 /**
@@ -302,22 +306,14 @@ bool GEM::online_detection(Eigen::VectorXd sample) {
     bool anomaly_found = false;
     Eigen::VectorXd S1_sample;
     Eigen::VectorXd tmp_distances(this->N1);
-    double dist, k_sum, tail_probability;
-    int i;
-
-    for (i = 0; i < this->N1; i++) {
-        S1_sample = this->S1.col(i);
-        dist = GEM::euclidean_dist(sample, S1_sample);
-        tmp_distances(i) = dist;
-    }
-     // sum the best k neighbors
-    std::sort(tmp_distances.begin(), tmp_distances.end());
-    k_sum = 0;
-    for (i = 0; (i < this->k) && (i < this->N1); i++) { k_sum += tmp_distances(i); }
+    
+    double k_sum = GEM::kNN(sample);
+    
+    double tail_probability;
 
     // compute probability
     tail_probability = ((double)characteristic_function(this->baseline_distances, k_sum)) / N2;
-    if (tail_probability == 0.0) {
+    if (tail_probability == 0.0) { // special case check
         tail_probability = (double) 1 / N2;
     }
 

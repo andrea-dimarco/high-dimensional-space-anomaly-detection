@@ -40,7 +40,7 @@ public:
     void set_h(double h);
     void set_alpha(double alpha);
 
-    void kNN(Eigen::MatrixXd S2);
+    double kNN(Eigen::MatrixXd S2);
 
     void save_model(std::string baseline_path="./baseline_distances.csv",
                     std::string parameters_path="./parameters.csv",

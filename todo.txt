@@ -3,4 +3,3 @@ TODO:
 - PCA online
 - verbosity
 - optimize GEM
-- refactoring kNN function

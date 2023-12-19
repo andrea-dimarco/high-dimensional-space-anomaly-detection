@@ -76,12 +76,11 @@ void PCA::compute_baseline_distances() {
 
 /**
  * Computes the covariance matrix given the datapoints from S1 and the sample mean
- * Should we trust stackoverflow?
  * https://stackoverflow.com/questions/15138634/eigen-is-there-an-inbuilt-way-to-calculate-sample-covariance
 */
 void PCA::compute_covariance_matrix() {
-    // Eigen::MatrixXd centered = centered = this->S1.rowwise() - this->baseline_mean_vector;
-    // this->covariance_matrix = (centered.adjoint() * centered) / double(this->N1);
+    Eigen::MatrixXd centered = centered = this->S1.rowwise() - this->baseline_mean_vector.transpose();
+    this->covariance_matrix = (centered.adjoint() * centered) / double(this->N1);
 } /* covariance matrix computation*/
 
 /**
@@ -96,26 +95,26 @@ void PCA::compute_summary_statistics() {
     // sort r_set in ascending order
     // assign to object vector
 }
-
+ /* compute_summary_statistics */
 /** 
  * Returns S1
 */
 Eigen::MatrixXd PCA::get_S1() {
     return this->S1;
-}
+} /* get_S1 */
 /** 
  * Returns S2
 */
 Eigen::MatrixXd PCA::get_S2() {
     return this->S2;
-}
+} /* get_S2 */
 /** 
  * Returns the baseline distances.
  * Don't forget to compute them in the OFFLINE phase!!
 */
 Eigen::MatrixXd PCA::get_baseline_distances() {
     return this->baseline_distances;
-}
+} /* get_baseline_distances */
 
 /**
  * Save the computed baseline in a .csv file
@@ -165,12 +164,10 @@ void PCA::offline_phase(Eigen::MatrixXd X,
 
     PCA::compute_subsets(X);
     if (save_file) { PCA::save_baseline(file_path); }
-}
+} /* offline_phase */
 
 bool PCA::online_detection(Eigen::VectorXd sample) {
 
-    bool anomaly_found = false;
-
-
-    return anomaly_found;
-}
+    
+    return false;
+} /* online_detection */
