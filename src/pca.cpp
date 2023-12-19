@@ -3,7 +3,7 @@
 /**
  * Constructor
 */
-PCA::PCA(int p, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/,float partition) {
+PCA::PCA(int p, float partition, int k/*=4*/,double alpha/*=2.0*/, double h/*=5.0*/) {
     
     assert((k>0) && (alpha>0) && (h>0));
     assert(p>0);

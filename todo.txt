@@ -1,8 +1,7 @@
 TODO:
-- optimize GEM
-- refactoring kNN function
-- implemet online only execution (load from data)
 - alternative random sampling
 - PCA offline
 - PCA online
-- verbosity of functions!!
+- verbosity
+- optimize GEM
+- refactoring kNN function

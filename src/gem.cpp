@@ -256,7 +256,6 @@ void GEM::save_parameters(std::string file_path/*="./parameters.csv"*/) {
 		save_file.close();
 	}
 } /* save_parameters */
-
 void GEM::load_parameters(std::string file_path/*="./parameters.csv"*/) {
     std::vector<double> values;
 	
@@ -283,21 +282,57 @@ void GEM::load_parameters(std::string file_path/*="./parameters.csv"*/) {
     this->k = parameters(4);
     this->h = parameters(5);
 } /* load_parameters */
+
+void GEM::save_S1(std::string file_path/*="./S1.csv"*/) {
+    const Eigen::IOFormat CSVFormat(Eigen::FullPrecision, Eigen::DontAlignCols, ", ", "\n");
+
+	std::ofstream save_file(file_path);
+	if (save_file.is_open()) {
+		save_file << this->S1.format(CSVFormat);
+		save_file.close();
+	}
+} /* save_S1 */
+void GEM::load_S1(std::string file_path/*="./S1.csv"*/) {
+    std::vector<double> matrixEntries;
+	
+	std::ifstream matrixDataFile(file_path); // store the data from the matrix
+	std::string matrixRowString; // store the row of the matrix that contains commas 
+	std::string matrixEntry; // store the matrix entry
+
+	// this variable is used to track the number of rows
+	int matrixRowNumber = 0;
+
+	while (std::getline(matrixDataFile, matrixRowString)) // here we read a row by row of matrixDataFile and store every line into the string variable matrixRowString
+	{
+		std::stringstream matrixRowStringStream(matrixRowString); //convert matrixRowString that is a string to a stream variable.
+
+		while (std::getline(matrixRowStringStream, matrixEntry,',')) // here we read pieces of the stream matrixRowStringStream until every comma, and store the resulting character into the matrixEntry
+		{
+			matrixEntries.push_back(std::stod(matrixEntry));   //here we convert the string to double and fill in the row vector storing all the matrix entries
+		}
+		matrixRowNumber++; //update the column numbers
+	}
+	this->S1 = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> (matrixEntries.data(), matrixRowNumber, matrixEntries.size() / matrixRowNumber);
+}
 /**
  * Save the model offline computed baseline and parameters
 */
 void GEM::save_model(std::string baseline_path/*="./baseline_distances.csv"*/,
-                std::string parameters_path/*="./parameters.csv"*/) {
+                std::string parameters_path/*="./parameters.csv"*/,
+                std::string S1_path/*="./S1.csv"*/) {
     save_baseline(baseline_path);
     save_parameters(parameters_path);
+    save_S1(S1_path);
 }
 /**
  * Load the model offline computed baseline and parameters
 */
 void GEM::load_model(std::string baseline_path/*="./baseline_distances.csv"*/,
-                std::string parameters_path/*="./parameters.csv"*/) {
+                std::string parameters_path/*="./parameters.csv"*/,
+                std::string S1_path/*="./S1.csv"*/) {
     load_baseline(baseline_path);
     load_parameters(parameters_path);
+    load_S1(S1_path);
 }
 
 

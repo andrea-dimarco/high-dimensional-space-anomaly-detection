@@ -47,9 +47,14 @@ public:
     void kNN();
 
     void save_model(std::string baseline_path="./baseline_distances.csv",
-                    std::string parameters_path="./parameters.csv");
+                    std::string parameters_path="./parameters.csv",
+                    std::string S1_path="./S1.csv");
     void load_model(std::string baseline_path="./baseline_distances.csv",
-                    std::string parameters_path="./parameters.csv");
+                    std::string parameters_path="./parameters.csv",
+                    std::string S1_path="./S1.csv");
+
+    void save_S1(std::string file_path="./S1.csv");
+    void load_S1(std::string file_path="./S1.csv");
 
     void save_baseline(std::string file_path="./baseline_distances.csv");
     void load_baseline(std::string file_path="./baseline_distances.csv");

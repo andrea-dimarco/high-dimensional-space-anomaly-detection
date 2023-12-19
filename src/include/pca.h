@@ -36,7 +36,7 @@ private:
     double h;        // anomaly detection threshold
     
 public:
-    PCA(int p, int k=4, double alpha=2.0, double h=5.0,float partition);
+    PCA(int p, float partition, int k=4, double alpha=2.0, double h=5.0);
 
     double l2_norm(Eigen::VectorXd p1);
 

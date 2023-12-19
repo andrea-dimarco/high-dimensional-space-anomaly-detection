@@ -9,6 +9,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <assert.h>
+#include <ctime>
 
 #include <Eigen/Dense>
 
@@ -63,25 +64,29 @@ int main()
 
     int N = 1000; // number of samples in the nominal data set (data guaranteed to have no anomalies)
 
-    // testing area 
+    // testing area
+    std::clock_t start;
+    double duration;
+    start = std::clock();
+
     Eigen::MatrixXd X;// = random_dataset(p, N, false/*normal*/); // nominal dataset
-    Eigen::MatrixXd Z;// = random_dataset(p, N, false/*normal*/, 0.5, 1.0); // poisoned dataset
 
-    // for (int i = 0; i < tau; i++) {
-    //     Z.col(i) = X.col(i);
-    // }
     SUV suv;
-    //X = suv.open_data("datasets/nominal-human-activity.csv");
-    p = X.rows(); N = X.cols();
-    std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
+    // Offline phase
+    // X = suv.open_data("datasets/nominal-human-activity.csv");
+    // p = X.rows(); N = X.cols();
+    // GEM gem(p);
+    // std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
+    // gem.offline_phase(X);
+    // duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    // std::cout<<"Duration: "<< duration << "s" << std::endl;
+    // std::cout << "Offline phase done!!" << std::endl;
+
+    // Online phase
+    X = suv.open_data("datasets/anomaly-human-activity.csv"); // anomaly!!
+    p = X.rows(); N = X.cols();
     GEM gem(p);
-
-    gem.offline_phase(X);
-    std::cout << "Offline phase done!!" << std::endl;
-
-    X = suv.open_data("datasets/anomaly-human-activity.csv");
-    p = X.rows(); N = X.cols();
     std::cout << "Anomalous samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
     std::cout << "Begin online phase..." << std::endl;
@@ -100,6 +105,5 @@ int main()
         }
     }
     std::cout << "No anomaly found." << std::endl;
-    
     return 0;
 } /* main */
