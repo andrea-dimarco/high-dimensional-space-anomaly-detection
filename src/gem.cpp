@@ -149,20 +149,27 @@ Eigen::MatrixXd GEM::get_baseline_distances() {
     return this->baseline_distances;
 }
 
+/**
+ * Resets the g value to 0.0, representing the amount (and intensity) of the outliers found.
+*/
 void GEM::reset_g() {
     this->g = 0.0;
 }
+/**
+ * Changes the stored h value representing the threshold for the anomaly detection.
+*/
 void GEM::set_h(double h) {
     this->h = h;
 }
+/**
+ * Changes the parameter alpha.
+*/
 void GEM::set_alpha(double alpha) {
     this->alpha = alpha;
 }
 
 /**
  * Computes the k Nearest Neighbors of the set S2 in the set S1.
- * if strict_k = true  it will return an error if the set S1 doesn't have enough neighbors
- * else                it will compute the baseline with less than k neighbors if S1 is small
 */
 void GEM::kNN() {
     // if these fail, you need to call GEM::partition_data(X) before kNN()!!
@@ -230,17 +237,82 @@ void GEM::load_baseline(std::string file_path/*="./baseline_distances.csv"*/) {
 	this->baseline_distances = Eigen::Map<Eigen::Vector<double, Eigen::Dynamic>> (values.data(), values.size());
 } /* load_baseline */
 
+void GEM::save_parameters(std::string file_path/*="./parameters.csv"*/) {
+    
+    const Eigen::IOFormat CSVFormat(Eigen::FullPrecision, Eigen::DontAlignCols, ", ", "\n");
+
+    Eigen::VectorXd parameters(6);
+
+    parameters(0) = this->N1;
+    parameters(1) = this->N2;
+    parameters(2) = this->alpha;
+    parameters(3) = this->p;
+    parameters(4) = this->k;
+    parameters(5) = this->h;
+    
+	std::ofstream save_file(file_path);
+	if (save_file.is_open()) {
+		save_file << parameters.format(CSVFormat);
+		save_file.close();
+	}
+} /* save_parameters */
+
+void GEM::load_parameters(std::string file_path/*="./parameters.csv"*/) {
+    std::vector<double> values;
+	
+	std::ifstream load_file(file_path); // store the data from the matrix
+	std::string row_string; // store the row of the matrix that contains commas 
+	std::string value; // store the matrix entry
+
+    Eigen::VectorXd parameters;
+
+	while (std::getline(load_file, row_string)) // here we read a row by row of matrixDataFile and store every line into the string variable matrixRowString
+	{
+		std::stringstream row_stream(row_string); //convert matrixRowString that is a string to a stream variable.
+
+		while (std::getline(row_stream, value, ',')) // here we read pieces of the stream row_stream until every comma, and store the resulting character into the matrixEntry
+		{
+			values.push_back(std::stod(value));   //here we convert the string to double and fill in the row vector storing all the matrix entries
+		}
+	}
+	parameters = Eigen::Map<Eigen::Vector<double, Eigen::Dynamic>> (values.data(), values.size());
+    this->N1 = parameters(0);
+    this->N2 = parameters(1);
+    this->alpha = parameters(2);
+    this->p = parameters(3);
+    this->k = parameters(4);
+    this->h = parameters(5);
+} /* load_parameters */
+/**
+ * Save the model offline computed baseline and parameters
+*/
+void GEM::save_model(std::string baseline_path/*="./baseline_distances.csv"*/,
+                std::string parameters_path/*="./parameters.csv"*/) {
+    save_baseline(baseline_path);
+    save_parameters(parameters_path);
+}
+/**
+ * Load the model offline computed baseline and parameters
+*/
+void GEM::load_model(std::string baseline_path/*="./baseline_distances.csv"*/,
+                std::string parameters_path/*="./parameters.csv"*/) {
+    load_baseline(baseline_path);
+    load_parameters(parameters_path);
+}
+
+
 /**
  * The whole offline phase of the GEM model.
 */
 void GEM::offline_phase(Eigen::MatrixXd X, float partition/*=0.15*/,
-                    bool save_file/*=true*/, std::string file_path/*="./baseline_distances.csv"*/) {
+                    bool save_file/*=true*/, std::string baseline_path/*="./baseline_distances.csv"*/,
+                    std::string parameters_path/*="./parameters.csv"*/) {
     // sanity check
     assert(X.rows() == this->p);
 
     GEM::partition_data(X, partition); // returns S1, S2
     GEM::kNN();// takes S1, S2 in input
-    if (save_file) { GEM::save_baseline(file_path); }
+    if (save_file) { GEM::save_model(baseline_path, parameters_path); }
 } /* offline_phase */
 
 /**

@@ -53,7 +53,7 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
-    int p = 561; // output dimension
+    int p = 10; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.
 
@@ -61,7 +61,7 @@ int main()
 
     // the model is unkown so must be simulated as i.i.d. variables
 
-    int N = 5738; // number of samples in the nominal data set (data guaranteed to have no anomalies)
+    int N = 1000; // number of samples in the nominal data set (data guaranteed to have no anomalies)
 
     // testing area 
     Eigen::MatrixXd X;// = random_dataset(p, N, false/*normal*/); // nominal dataset
@@ -71,14 +71,13 @@ int main()
     //     Z.col(i) = X.col(i);
     // }
     SUV suv;
-    X = suv.open_data("datasets/nominal-human-activity.csv");
+    //X = suv.open_data("datasets/nominal-human-activity.csv");
     p = X.rows(); N = X.cols();
     std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
     GEM gem(p);
-    gem.load_baseline("baseline_distances.csv");
-    gem.offline_phase(X);
 
+    gem.offline_phase(X);
     std::cout << "Offline phase done!!" << std::endl;
 
     X = suv.open_data("datasets/anomaly-human-activity.csv");
@@ -86,6 +85,7 @@ int main()
     std::cout << "Anomalous samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
     std::cout << "Begin online phase..." << std::endl;
+    gem.load_model();
     int percentage;
     for (int i = 0; i < N; i++) {
         // progress notification

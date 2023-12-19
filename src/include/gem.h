@@ -46,12 +46,22 @@ public:
 
     void kNN();
 
+    void save_model(std::string baseline_path="./baseline_distances.csv",
+                    std::string parameters_path="./parameters.csv");
+    void load_model(std::string baseline_path="./baseline_distances.csv",
+                    std::string parameters_path="./parameters.csv");
+
     void save_baseline(std::string file_path="./baseline_distances.csv");
     void load_baseline(std::string file_path="./baseline_distances.csv");
 
+    void save_parameters(std::string file_path="./parameters.csv");
+    void load_parameters(std::string file_path="./parameters.csv");
+
     int characteristic_function(Eigen::VectorXd v, double scalar);
 
-    void offline_phase(Eigen::MatrixXd X, float partition=0.15, bool save_file=true, std::string file_path="./baseline_distances.csv");
+    void offline_phase(Eigen::MatrixXd X, float partition=0.15,
+                        bool save_file=true, std::string baseline_path="./baseline_distances.csv",
+                        std::string parameters_path="./parameters.csv");
 
     // return true if anomaly found
     bool online_detection(Eigen::VectorXd sample);
