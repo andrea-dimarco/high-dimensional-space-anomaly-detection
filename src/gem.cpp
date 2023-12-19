@@ -61,8 +61,8 @@ Eigen::MatrixXd GEM::partition_data(Eigen::MatrixXd X, float partition/*=0.15*/)
 
     // Get S2
     for (j = 0; j < this->N2; j++) { S2.col(j) = X.col(indexes(i++)); }
-    assert(i == N); // we got every element
 
+    assert(i == N); // we got every element
     return S2;
 } /* partition_data */
 
@@ -104,33 +104,32 @@ void GEM::set_alpha(double alpha) {
  * Computes the k Nearest Neighbors of the set S2 in the set S1.
  * returns the last k_sum computed, this feature will be used in the online detection phase.
 */
-double GEM::kNN(Eigen::MatrixXd S2) {
+double GEM::kNN(Eigen::MatrixXd S2, bool is_offline/*=false*/) {
     // if these fail, you need to call GEM::partition_data(X) before kNN()!!
     assert((this->N == (this->N1 + this->N2)));
     assert(this->baseline_distances.size() == this->N2);
     assert(this->S1.cols() == this->N1);
+    assert(S2.rows() == this->p);
 
     Eigen::MatrixXd S1_sample, S2_sample;
     Eigen::VectorXd tmp_distances(this->N1);
+    Eigen::VectorXd test_dists(this->N1);
     double dist, k_sum;
     int i, j;
     for (i = 0; i < S2.cols(); i++) {
         // compute distances
         S2_sample = S2.col(i);
-        tmp_distances.setZero();
 
-        
-        for (j = 0; j < this->N1; j++) {
-            S1_sample = this->S1.col(j);
-            dist = GEM::euclidean_dist(S1_sample, S2_sample);
-            tmp_distances(j) = dist;
-        }
+        // Eigen goes Brrr         broadcasting                      L2 norm
+        tmp_distances = (S2_sample.replicate(1,this->N1) - this->S1).cwiseAbs2().colwise().sum().cwiseSqrt();
+
         // sum the best k neighbors
         std::sort(tmp_distances.begin(), tmp_distances.end());
         k_sum = 0;
         for (j = 0; (j < this->k) && (j < this->N1); j++) { k_sum += tmp_distances(j); }
+
         // store value
-        this->baseline_distances(i) = k_sum;
+        if (is_offline) { this->baseline_distances(i) = k_sum; }
     }
     return k_sum;
 } /* kNN */
@@ -281,7 +280,7 @@ void GEM::offline_phase(Eigen::MatrixXd X, float partition/*=0.15*/,
     assert(X.rows() == this->p);
 
     Eigen::MatrixXd S2 = GEM::partition_data(X, partition); // returns S2
-    GEM::kNN(S2);// takes S2 in input
+    GEM::kNN(S2, true);// takes S2 in input
     if (save_file) { GEM::save_model(baseline_path, parameters_path); }
 } /* offline_phase */
 

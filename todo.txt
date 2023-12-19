@@ -1,5 +1,4 @@
 TODO:
 - PCA offline
 - PCA online
-- verbosity
-- optimize GEM
+- verbosity? (do we really need it)
