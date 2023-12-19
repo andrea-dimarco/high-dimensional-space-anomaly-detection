@@ -100,5 +100,6 @@ int main()
         }
     }
     std::cout << "No anomaly found." << std::endl;
+    
     return 0;
 } /* main */
