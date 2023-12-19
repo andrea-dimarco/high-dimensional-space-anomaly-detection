@@ -73,15 +73,15 @@ int main()
 
     SUV suv;
     // GEM Offline phase
-    // X = suv.open_data("datasets/nominal-human-activity.csv");
-    // p = X.rows(); N = X.cols();
-    // GEM gem(p);
-    // std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
+    X = suv.open_data("datasets/nominal-human-activity.csv");
+    p = X.rows(); N = X.cols();
+    GEM gem(p);
+    std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
-    // gem.offline_phase(X);
-    // duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    // std::cout<<"Duration: "<< duration << "s" << std::endl;
-    // std::cout << "Offline phase done!!" << std::endl;
+    gem.offline_phase(X);
+    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    std::cout<<"Duration: "<< duration << "s" << std::endl;
+    std::cout << "Offline phase done!!" << std::endl;
 
     // GEM Online phase
     // X = suv.open_data("datasets/anomaly-human-activity.csv"); // anomaly!!

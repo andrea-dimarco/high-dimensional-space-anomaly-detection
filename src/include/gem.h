@@ -16,7 +16,6 @@ class GEM {
 
 private:
     Eigen::MatrixXd S1;
-    Eigen::MatrixXd S2;
     Eigen::VectorXd baseline_distances;
     int N, N1, N2;   // set partition dimensions
     double g;        // current level of outliers detected 
@@ -32,19 +31,16 @@ public:
 
     double ReLU(double x);
 
-    void partition_data(Eigen::MatrixXd X, float partition=0.15);
+    Eigen::MatrixXd partition_data(Eigen::MatrixXd X, float partition=0.15);
 
     Eigen::MatrixXd get_S1();
-    Eigen::MatrixXd get_S2();
     Eigen::MatrixXd get_baseline_distances();
 
     void reset_g();
     void set_h(double h);
     void set_alpha(double alpha);
 
-    Eigen::MatrixXd random_permutation(Eigen::MatrixXd X, bool columns=true, bool index_check=true);
-
-    void kNN();
+    void kNN(Eigen::MatrixXd S2);
 
     void save_model(std::string baseline_path="./baseline_distances.csv",
                     std::string parameters_path="./parameters.csv",

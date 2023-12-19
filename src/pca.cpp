@@ -80,9 +80,8 @@ void PCA::compute_baseline_distances() {
  * https://stackoverflow.com/questions/15138634/eigen-is-there-an-inbuilt-way-to-calculate-sample-covariance
 */
 void PCA::compute_covariance_matrix() {
-    Eigen::MatrixXd centered;
-    centered = this->S1.rowwise() - this->baseline_mean_vector;
-    this->covariance_matrix = (centered.adjoint() * centered) / double(this->N1);
+    // Eigen::MatrixXd centered = centered = this->S1.rowwise() - this->baseline_mean_vector;
+    // this->covariance_matrix = (centered.adjoint() * centered) / double(this->N1);
 } /* covariance matrix computation*/
 
 /**

@@ -1,5 +1,4 @@
 TODO:
-- alternative random sampling for GEM (copy i from PCA)
 - PCA offline
 - PCA online
 - verbosity

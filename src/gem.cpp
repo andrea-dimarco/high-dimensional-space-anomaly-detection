@@ -35,7 +35,7 @@ double GEM::ReLU(double x) {
  * Given the set of nominal datapoints, randomly partitions the data in the two sets S1 and S2.
  * TODO: find better way of randomly selecting samples, like generating M uniformly random indexes to define one of the two partitions?
 */
-void GEM::partition_data(Eigen::MatrixXd X, float partition/*=0.15*/) {
+Eigen::MatrixXd GEM::partition_data(Eigen::MatrixXd X, float partition/*=0.15*/) {
     
     assert(X.rows() == this->p); // feature dimension must be on the y axis
     assert((partition>0.0) && (partition<1.0));
@@ -46,100 +46,32 @@ void GEM::partition_data(Eigen::MatrixXd X, float partition/*=0.15*/) {
     this->N2 = this->N - this->N1;
 
     this->S1.resize(this->p,this->N1);
-    this->S2.resize(this->p,this->N2);
+    Eigen::MatrixXd S2(this->p, this->N2);
     this->baseline_distances.resize(this->N2);
     this->baseline_distances.setZero();
 
-    // Don't forget the random shuffle!!
-    Eigen::MatrixXd X_perm = GEM::random_permutation(X);
+    // Select random items
+    Eigen::VectorXd indexes(this->N);
+    int i, j;
+    for (i = 0; i < this->N; i++) { indexes(i) = i; }
+    std::random_shuffle(indexes.begin(), indexes.end());
 
-    int i, j, l;
-    i = 0;
-    for (j = 0; i < N1; j++) {
-        S1.col(j) = X_perm.col(i);
-        i++;
-    }
-    for (l = 0; l < N2; l++) {
-        S2.col(l) = X_perm.col(i);
-        i++;
-    }
+    // Get S1 
+    for (i = 0; i < this->N1; i++) { this->S1.col(i) = X.col(indexes(i)); }
+
+    // Get S2
+    for (j = 0; j < this->N2; j++) { S2.col(j) = X.col(indexes(i++)); }
     assert(i == N); // we got every element
+
+    return S2;
 } /* partition_data */
 
-/**
- * Randomly permutates either the columns or the rows of the given matrix.
- * Depending on the assignment of the boolean variable columns:
- *  columns = true  -> permutates columns
- *  columns = false -> permutate rows
- * Also:
- *  index_check = true  -> will NEVER try to swap the column with itself
- *  index_check = false -> might swap the column with itseld (so no swap)
-*/
-Eigen::MatrixXd GEM::random_permutation(Eigen::MatrixXd X, bool columns/*=true*/, bool index_check/*=true*/) {
-    // Sanity check
-    if (columns) {
-        if (X.cols() == 1) {
-            std::cout << "Are you kidding me??" << std::endl;
-            return X;
-        }
-    } else {
-        if (X.rows() == 1) {
-            std::cout << "Are you kidding me??" << std::endl;
-            return X;
-        }
-    }
-
-    // Define a PRG
-    std::default_random_engine engine(0);
-    std::bernoulli_distribution bernoulli;
-    Eigen::MatrixXd X_perm = X;
-    int i, swap_index;
-    Eigen::MatrixXd tmp;
-
-    // Permutate
-    if (columns) {
-        std::uniform_int_distribution<> uniform_cols(0, X.cols()-1);
-        // randomly permutate columns
-        for (i = 0; i < X.cols(); i++) {
-            if (bernoulli(engine)) {
-                // swap column with another random column
-                do {
-                    swap_index = uniform_cols(engine);
-                } while((swap_index == i) && index_check); // don't swap the vector with itself!!
-                tmp = X_perm.col(i);
-                X_perm.col(i) = X_perm.col(swap_index);
-                X_perm.col(swap_index) = tmp;
-            }
-        }
-    } else {
-        std::uniform_int_distribution<> uniform_rows(0, X.rows()-1);
-        // randomly permutate rows
-        for (i = 0; i < X.rows(); i++) {
-            if (bernoulli(engine)) {
-                // swap column with another random column
-                do {
-                    swap_index = uniform_rows(engine);
-                } while((swap_index == i) && index_check); // don't swap the vector with itself!!
-                tmp = X_perm.row(i);
-                X_perm.row(i) = X_perm.row(swap_index);
-                X_perm.row(swap_index) = tmp;
-            }
-        }
-    }
-    return X_perm;
-} /* random_permutation */
 
 /** 
  * Returns S1
 */
 Eigen::MatrixXd GEM::get_S1() {
     return this->S1;
-}
-/** 
- * Returns S2
-*/
-Eigen::MatrixXd GEM::get_S2() {
-    return this->S2;
 }
 /** 
  * Returns the baseline distances.
@@ -171,12 +103,11 @@ void GEM::set_alpha(double alpha) {
 /**
  * Computes the k Nearest Neighbors of the set S2 in the set S1.
 */
-void GEM::kNN() {
+void GEM::kNN(Eigen::MatrixXd S2) {
     // if these fail, you need to call GEM::partition_data(X) before kNN()!!
     assert((this->N == (this->N1 + this->N2)));
     assert(this->baseline_distances.size() == this->N2);
     assert(this->S1.cols() == this->N1);
-    assert(this->S2.cols() == this->N2);
 
     Eigen::MatrixXd S1_sample, S2_sample;
     Eigen::VectorXd tmp_distances(this->N1);
@@ -184,7 +115,7 @@ void GEM::kNN() {
     int i, j;
     for (i = 0; i < this->N2; i++) {
         // compute distances
-        S2_sample = this->S2.col(i);
+        S2_sample = S2.col(i);
         tmp_distances.setZero();
         for (j = 0; j < this->N1; j++) {
             S1_sample = this->S1.col(j);
@@ -345,8 +276,8 @@ void GEM::offline_phase(Eigen::MatrixXd X, float partition/*=0.15*/,
     // sanity check
     assert(X.rows() == this->p);
 
-    GEM::partition_data(X, partition); // returns S1, S2
-    GEM::kNN();// takes S1, S2 in input
+    Eigen::MatrixXd S2 = GEM::partition_data(X, partition); // returns S2
+    GEM::kNN(S2);// takes S2 in input
     if (save_file) { GEM::save_model(baseline_path, parameters_path); }
 } /* offline_phase */
 
