@@ -8,8 +8,8 @@
 #include <cstdlib>
 #include <assert.h>
 #include <cmath>
-#include <Eigen/Dense>
-#include <Eigen/src/Core/Map.h>
+#include <eigen3/Eigen/Dense>
+#include <eigen3/Eigen/src/Core/Map.h>
 #include <fstream>
 
 class PCA {
