@@ -65,13 +65,26 @@ void PCA::compute_pca() {
     this->baseline_distances.setZero();
 
     this->baseline_mean_vector = S1.colwise().mean(); // mean for every feature (column wise)
+
+    // get the sample data covariance matrix
+
+    // based on gamma derive optimal r (subdimension value)
+
+    // sort eigenvalues in descending order
+
+    // get V = the eigen vectors corresponding to the r largest eigenvalues
+
+    //compute proj = V * V'
+
+    //compute res_proj = Identity Matrix - proj
+    
 }
 
 /**
  * Compute baseline distances (residual magnitudes) using X_2 and the principal subspace
 */
 void PCA::compute_baseline_distances() {
-
+    // for every datapoint in S2
 }
 
 /**
@@ -79,7 +92,7 @@ void PCA::compute_baseline_distances() {
  * https://stackoverflow.com/questions/15138634/eigen-is-there-an-inbuilt-way-to-calculate-sample-covariance
 */
 void PCA::compute_covariance_matrix() {
-    Eigen::MatrixXd centered = centered = this->S1.rowwise() - this->baseline_mean_vector.transpose();
+    Eigen::MatrixXd centered = this->S1.rowwise() - this->baseline_mean_vector.transpose();
     this->covariance_matrix = (centered.adjoint() * centered) / double(this->N1);
 } /* covariance matrix computation*/
 
