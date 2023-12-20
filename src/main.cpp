@@ -2,7 +2,7 @@
 
 #include "include/suv.h"
 #include "include/gem.h"
-
+#include "include/pca.h"
 #include <iostream>
 #include <assert.h>
 #include <random>
@@ -72,34 +72,40 @@ int main()
     Eigen::MatrixXd X = random_dataset(p, N, false/*normal*/); // nominal dataset
 
     SUV suv;
-    GEM gem(p);
+     
+    //GEM gem(p);
 
+    PCA pca(p);
+    std::cout << "Samples loaded" << std::endl;
+
+    pca.offline_phase(X);
     
-    // X = suv.open_data("datasets/nominal-human-activity.csv");
-    // p = X.rows(); N = X.cols();
-    // GEM gem(p);
-    // std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
+    std::cout << "Finished PCA offline phase" << std::endl;
+    // // X = suv.open_data("datasets/nominal-human-activity.csv");
+    // // p = X.rows(); N = X.cols();
+    // // GEM gem(p);
+    // // std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
-    gem.offline_phase(X);
-    // duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    // std::cout<<"Duration: "<< duration << "s" << std::endl;
-    std::cout << "Offline phase done!!" << std::endl;
+    // gem.offline_phase(X);
+    // // duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    // // std::cout<<"Duration: "<< duration << "s" << std::endl;
+    // std::cout << "Offline phase done!!" << std::endl;
 
-    // // GEM Online phase
-    X = random_dataset(p, N, true/*uniform*/, -1.0, 0.0); // anomalous dataset
+    // // // GEM Online phase
+    // X = random_dataset(p, N, true/*uniform*/, -1.0, 0.0); // anomalous dataset
     // // X = suv.open_data("datasets/anomaly-human-activity.csv"); // anomaly!!
     // p = X.rows(); N = X.cols();
     // std::cout << "Anomalous samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
-    std::cout << "Begin online phase..." << std::endl;
-    gem.load_model();
-    for (int i = 0; i < N; i++) {
-        // anomaly detection
-        if (gem.online_detection(X.col(i))) {
-            std::cout << "Anomaly found with delay: " << (i-tau) << "!!" << std::endl;
-            return 0;
-        }
-    }
-    std::cout << "No anomaly found." << std::endl;
-    // return 0;
+    // std::cout << "Begin online phase..." << std::endl;
+    // gem.load_model();
+    // for (int i = 0; i < N; i++) {
+    //     // anomaly detection
+    //     if (gem.online_detection(X.col(i))) {
+    //         std::cout << "Anomaly found with delay: " << (i-tau) << "!!" << std::endl;
+    //         return 0;
+    //     }
+    // }
+    // std::cout << "No anomaly found." << std::endl;
+    return 0;
 } /* main */

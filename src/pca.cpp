@@ -55,21 +55,34 @@ void PCA::compute_subsets(Eigen::MatrixXd X) {
     // Get S2
     std::random_shuffle(indexes.begin(), indexes.end());
     for (int i = 0; i < N2; i++) { S2.col(i) = X.col(indexes(i)); }
+
 } /* cumpute_subsets */
 
 /**
  * Determine the principal subspace using Xstat_PCA
 */
 void PCA::compute_pca() {
-    this->baseline_distances.resize(this->N2);
-    this->baseline_distances.setZero();
 
-    this->baseline_mean_vector = S1.colwise().mean(); // mean for every feature (column wise)
+    // compute the sample data mean vector
+    this->baseline_mean_vector = S1.rowwise().mean(); // mean for every feature (column wise)
+    std::cout << "Sample data mean computed" << std::endl;
 
     // get the sample data covariance matrix
+    PCA::compute_covariance_matrix();
+    std:: cout << "Covariance matrix computed\n";
+    // calculate eigen vectors and eigen vlaues
 
+    // define matrix for eigens
+    Eigen::MatrixXcd eigen_value_matrix;
+    Eigen::MatrixXcd eigen_vector_matrix;
+    Eigen::EigenSolver<Eigen::MatrixXd> eigen_value_solver(covariance_matrix);
+    eigen_value_matrix =  eigen_value_solver.eigenvalues();
+    eigen_vector_matrix = eigen_value_solver.eigenvectors();
+    std::cout << "Eigen components found\n";
+    std::cout << "Row dimension of eigenvector " << eigen_vector_matrix.rows() << std::endl;
+    std::cout << "Column dimension of eigenvector " << eigen_vector_matrix.cols() << std::endl;
     // based on gamma derive optimal r (subdimension value)
-
+    
     // sort eigenvalues in descending order
 
     // get V = the eigen vectors corresponding to the r largest eigenvalues
@@ -84,6 +97,9 @@ void PCA::compute_pca() {
  * Compute baseline distances (residual magnitudes) using X_2 and the principal subspace
 */
 void PCA::compute_baseline_distances() {
+    this->baseline_distances.resize(this->N2);
+    this->baseline_distances.setZero();
+
     // for every datapoint in S2
 }
 
@@ -92,7 +108,7 @@ void PCA::compute_baseline_distances() {
  * https://stackoverflow.com/questions/15138634/eigen-is-there-an-inbuilt-way-to-calculate-sample-covariance
 */
 void PCA::compute_covariance_matrix() {
-    Eigen::MatrixXd centered = this->S1.rowwise() - this->baseline_mean_vector.transpose();
+    Eigen::MatrixXd centered = this->S1.colwise() - this->baseline_mean_vector;
     this->covariance_matrix = (centered.adjoint() * centered) / double(this->N1);
 } /* covariance matrix computation*/
 
@@ -173,9 +189,19 @@ void PCA::offline_phase(Eigen::MatrixXd X,
                     bool strict_k/*=false*/, bool save_file/*=true*/, 
                     std::string file_path/*="./baseline_distances.csv"*/) {
     // sanity check
+    std::cout << "Starting offline phase" << std::endl;
+
     assert(X.rows() == this->p);
 
     PCA::compute_subsets(X);
+    std::cout << "Subsets computed" << std::endl;
+
+    std::cout << "S1 cardinality " << S1.cols() << std::endl;
+    
+    PCA::compute_pca();
+    std::cout << "Principal Components found\n";
+
+    std::cout << "Proceeding to baseline statistics\n";
     if (save_file) { PCA::save_baseline(file_path); }
 } /* offline_phase */
 
