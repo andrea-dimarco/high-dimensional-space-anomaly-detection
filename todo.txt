@@ -11,4 +11,4 @@ FUTURE DEVELOPEMENT
 - hyperparameter optimization
 
 NOTES
-- tried to optimize pca with matrixes, the math works but it's slower :(
+- tried to optimize pca with matrixes, the math works but it's slower :(  (you pessimised?)
