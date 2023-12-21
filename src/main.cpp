@@ -11,7 +11,8 @@
 #include <assert.h>
 #include <ctime>
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
+//#include <eigen3/Eigen/Dense>
 
 /**
  * Generate a matrix of random values given 5 parameters
@@ -54,7 +55,7 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
-    int p = 30; // output dimension
+    int p = 3; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.
 
@@ -62,7 +63,7 @@ int main()
 
     // the model is unkown so must be simulated as i.i.d. variables
 
-    int N = 1000; // number of samples in the nominal data set (data guaranteed to have no anomalies)
+    int N = 100; // number of samples in the nominal data set (data guaranteed to have no anomalies)
 
     // testing area
     std::clock_t start;
@@ -79,8 +80,8 @@ int main()
     std::cout << "Samples loaded" << std::endl;
 
     pca.offline_phase(X);
-    
     std::cout << "Finished PCA offline phase" << std::endl;
+
     // // X = suv.open_data("datasets/nominal-human-activity.csv");
     // // p = X.rows(); N = X.cols();
     // // GEM gem(p);

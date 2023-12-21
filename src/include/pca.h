@@ -8,8 +8,10 @@
 #include <cstdlib>
 #include <assert.h>
 #include <cmath>
-#include <eigen3/Eigen/Dense>
-#include <eigen3/Eigen/src/Core/Map.h>
+#include <Eigen/Dense>
+#include <Eigen/src/Core/Map.h>
+// #include <eigen3/Eigen/Dense>
+// #include <eigen3/Eigen/src/Core/Map.h>
 #include <fstream>
 
 class PCA {
@@ -21,12 +23,9 @@ class PCA {
  * Compute r based on gamma and form matrix V
 */
 private:
-    Eigen::MatrixXd S1;
-    Eigen::MatrixXd S2;
-    Eigen::VectorXd baseline_distances;
-
-    Eigen::VectorXd baseline_mean_vector;
-    Eigen::MatrixXd covariance_matrix;
+    Eigen::MatrixXd S1, S2;
+    Eigen::VectorXd baseline_distances, baseline_mean_vector;
+    Eigen::MatrixXd res_proj;
 
     int N, N1, N2;   // set partition dimensions
     float partition_1, partition_2; // dimensions of S1, S2
@@ -53,7 +52,7 @@ public:
     void save_baseline(std::string file_path="./baseline_distances.csv");
     void load_baseline(std::string file_path="./baseline_distances.csv");
 
-    void compute_covariance_matrix();
+    Eigen::MatrixXd compute_covariance_matrix();
     void compute_summary_statistics();
 
     void offline_phase(Eigen::MatrixXd X, bool strict_k=false, bool save_file=true, std::string file_path="./baseline_distances.csv");
