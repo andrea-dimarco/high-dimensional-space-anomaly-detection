@@ -3,3 +3,8 @@ TODO:
 - PCA online
 - verbosity? (do we really need it)
 - GEM does not recognize a change in the distriution!!
+
+EXTRA NOTES 
+- detect mean change 
+- detect variance change 
+- detect change in both

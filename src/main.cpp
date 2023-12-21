@@ -54,7 +54,7 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
-    int p = 100; // output dimension
+    int p = 30; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.
 
