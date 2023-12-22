@@ -1,4 +1,5 @@
 TODO:
+- save and load PCA models
 - verbosity for GEM
 - optimize PCA memory
 - GEM does not recognize a change in the distriution!!
