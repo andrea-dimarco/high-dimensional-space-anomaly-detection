@@ -103,13 +103,15 @@ void PCA::compute_pca() {
 }
 
 /**
- * Compute baseline distances (residual magnitudes) using X_2 and the principal subspace
+ * Computes baseline distances (residual magnitudes) using S2 and the principal subspace
 */
 void PCA::compute_baseline_distances() {
-    this->baseline_distances.resize(this->N2);
-    this->baseline_distances.setZero();
-
-    // for every datapoint in S2
+    // for every datapoint in S2 compute the variance, then rowwise the L2 norm
+    this->baseline_distances = ( this->res_proj *
+                                    ( this->S2 - 
+                                        this->baseline_mean_vector.replicate(1,this->N2) ) )
+                                            .rowwise().squaredNorm();
+    assert(this->baseline_distances.rows() == this->p);
 }
 
 /**
@@ -210,6 +212,8 @@ void PCA::offline_phase(Eigen::MatrixXd X,
     std::cout << "Principal Components found\n";
 
     std::cout << "Proceeding to baseline statistics\n";
+    PCA::compute_baseline_distances();
+
     if (save_file) { PCA::save_baseline(file_path); }
 } /* offline_phase */
 
