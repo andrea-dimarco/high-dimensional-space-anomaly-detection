@@ -108,10 +108,9 @@ void PCA::compute_pca() {
 void PCA::compute_baseline_distances() {
     // for every datapoint in S2 compute the variance, then rowwise the L2 norm
     this->baseline_distances = ( this->res_proj *
-                                    ( this->S2 - 
-                                        this->baseline_mean_vector.replicate(1,this->N2) ) )
+                                    ( this->S2 - this->baseline_mean_vector.replicate(1,this->N2) ) )
                                             .rowwise().squaredNorm();
-    assert(this->baseline_distances.rows() == this->p);
+    assert(this->baseline_distances.rows() == this->p); // WHAT HAVE YOU DONE??
 }
 
 /**
@@ -125,7 +124,6 @@ Eigen::MatrixXd PCA::compute_covariance_matrix() {
 /**
  * Computes summary statistics of the PCA based algorithm 
  * i.e. the set of the l2 of the residual terms for each datapoint in S2
- * 
 */
 void PCA::compute_summary_statistics() {
     // for each datapoint in s2 

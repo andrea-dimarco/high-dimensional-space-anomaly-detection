@@ -1,7 +1,7 @@
 TODO:
 - PCA offline
 - PCA online
-- verbosity? (do we really need it)
+- verbosity for GEM
 - GEM does not recognize a change in the distriution!!
 
 FUTURE DEVELOPEMENT
@@ -9,6 +9,3 @@ FUTURE DEVELOPEMENT
 - detect variance change 
 - detect change in both
 - hyperparameter optimization
-
-NOTES
-- tried to optimize pca with matrixes, the math works but it's slower :(  (you pessimised?)
