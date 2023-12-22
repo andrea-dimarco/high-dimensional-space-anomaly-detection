@@ -108,10 +108,16 @@ void PCA::compute_pca() {
 */
 void PCA::compute_baseline_distances() {
     // for every datapoint in S2 compute the variance, then rowwise the L2 norm
+    // should be a vector with the same cardinality as S2 
+    // this is wrong I think
     this->baseline_distances = ( this->res_proj *
                                     ( this->S2 - this->baseline_mean_vector.replicate(1,this->N2) ) )
                                             .rowwise().squaredNorm();
     assert(this->baseline_distances.rows() == this->p); // WHAT HAVE YOU DONE??
+
+    // sort the vector of l2 norms of residuals
+    std::sort(this->baseline_distances.begin(),this->baseline_distances.end());
+
 }
 
 /**
@@ -122,18 +128,6 @@ Eigen::MatrixXd PCA::compute_covariance_matrix() {
     return (centered * centered.adjoint()) / double(this->N1);
 } /* covariance matrix computation*/
 
-/**
- * Computes summary statistics of the PCA based algorithm 
- * i.e. the set of the l2 of the residual terms for each datapoint in S2
-*/
-void PCA::compute_summary_statistics() {
-    // for each datapoint in s2 
-        // compute rj 
-        //compute the norm of rj
-    // sort r_set in ascending order
-    // assign to object vector
-}
- /* compute_summary_statistics */
 /** 
  * Returns S1
 */
@@ -235,6 +229,7 @@ bool PCA::online_detection(Eigen::VectorXd sample) {
     Eigen::VectorXd S1_sample;
     Eigen::VectorXd tmp_distances(this->N1);
     
+    // calculate residual term for the sample
     double residual_term= 0.5;
     
     double tail_probability;

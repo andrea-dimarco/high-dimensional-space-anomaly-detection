@@ -52,7 +52,6 @@ public:
     void load_baseline(std::string file_path="./baseline_distances.csv");
 
     Eigen::MatrixXd compute_covariance_matrix();
-    void compute_summary_statistics();
 
     void offline_phase(Eigen::MatrixXd X, bool strict_k=false, bool save_file=true, std::string file_path="./baseline_distances.csv");
 
