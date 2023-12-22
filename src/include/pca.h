@@ -42,6 +42,7 @@ public:
     void compute_subsets(Eigen::MatrixXd X);
     void compute_pca();
     void compute_baseline_distances();
+    int characteristic_function(Eigen::VectorXd v, double scalar);
 
     Eigen::MatrixXd get_S1();
     Eigen::MatrixXd get_S2();

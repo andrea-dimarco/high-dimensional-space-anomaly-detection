@@ -96,6 +96,7 @@ void PCA::compute_pca() {
     std::cout << "Found best subdimension r: " << optimal_subdimension << std::endl;
 
     // get V = the eigen vectors corresponding to the r largest eigenvalues
+    // we take every row but only the r (= optimal dimension) rightmost columns
     Eigen::MatrixXd V = eigen_vector_matrix(Eigen::all,Eigen::lastN(optimal_subdimension));
         
     // compute res_proj = Identity Matrix - (V * V')
@@ -211,12 +212,47 @@ void PCA::offline_phase(Eigen::MatrixXd X,
 
     std::cout << "Proceeding to baseline statistics\n";
     PCA::compute_baseline_distances();
-
+    std::cout << "Baseline distances calculated\n" << baseline_distances << std::endl;
     if (save_file) { PCA::save_baseline(file_path); }
 } /* offline_phase */
 
+/**
+ * Counts the amount of element in the vector v that are greater than scalar
+*/
+int PCA::characteristic_function(Eigen::VectorXd v, double scalar) {
+    int result = 0;
+    for(int i = 0; i < v.size(); i++) {
+        if (v(i) >= scalar) {
+            result++;
+        }
+    }
+    return result;
+} /* characteristic_function */
+
 bool PCA::online_detection(Eigen::VectorXd sample) {
 
+    bool anomaly_found = false;
+    Eigen::VectorXd S1_sample;
+    Eigen::VectorXd tmp_distances(this->N1);
     
-    return false;
+    double residual_term= 0.5;
+    
+    double tail_probability;
+
+    // compute probability
+    tail_probability = ((double)characteristic_function(this->baseline_distances, residual_term)) / N2;
+    if (tail_probability == 0.0) { // special case check
+        tail_probability = (double) 1 / N2;
+    }
+
+    // CUSUM
+    this->g += log(this->alpha / tail_probability);
+
+    // anomaly check
+    if (this->g >= this->h) {
+        anomaly_found = true;
+    } else {
+        anomaly_found = false;
+    }
+    return anomaly_found;
 } /* online_detection */

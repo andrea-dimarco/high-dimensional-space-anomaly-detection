@@ -54,7 +54,7 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
-    int p = 3; // output dimension
+    int p = 10; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.
 
@@ -62,7 +62,7 @@ int main()
 
     // the model is unkown so must be simulated as i.i.d. variables
 
-    int N = 100; // number of samples in the nominal data set (data guaranteed to have no anomalies)
+    int N = 1000; // number of samples in the nominal data set (data guaranteed to have no anomalies)
 
     // testing area
     std::clock_t start;
