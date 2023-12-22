@@ -112,12 +112,11 @@ void PCA::compute_baseline_distances() {
     // this is wrong I think
     this->baseline_distances = ( this->res_proj *
                                     ( this->S2 - this->baseline_mean_vector.replicate(1,this->N2) ) )
-                                            .rowwise().squaredNorm();
-    assert(this->baseline_distances.rows() == this->p); // WHAT HAVE YOU DONE??
+                                            .colwise().squaredNorm();
+    assert(this->baseline_distances.rows() == this->N2); 
 
     // sort the vector of l2 norms of residuals
     std::sort(this->baseline_distances.begin(),this->baseline_distances.end());
-
 }
 
 /**
