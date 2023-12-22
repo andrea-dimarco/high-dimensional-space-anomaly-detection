@@ -7,8 +7,6 @@
 #include <vector>
 #include <Eigen/Dense>
 #include <Eigen/src/Core/Map.h>
-// #include <eigen3/Eigen/Dense>
-// #include <eigen3/Eigen/src/Core/Map.h>
 
 // x(t) = A*x(t-1) + B*u(t-1)
 // y(t) = C*x(t-1)

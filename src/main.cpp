@@ -12,7 +12,6 @@
 #include <ctime>
 
 #include <Eigen/Dense>
-//#include <eigen3/Eigen/Dense>
 
 /**
  * Generate a matrix of random values given 5 parameters
