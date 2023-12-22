@@ -1,7 +1,6 @@
 TODO:
-- PCA offline
-- PCA online
 - verbosity for GEM
+- optimize PCA memory
 - GEM does not recognize a change in the distriution!!
 
 FUTURE DEVELOPEMENT
@@ -9,3 +8,4 @@ FUTURE DEVELOPEMENT
 - detect variance change 
 - detect change in both
 - hyperparameter optimization
+- a lot of online detections are found at delay 5417 (??)

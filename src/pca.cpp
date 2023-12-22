@@ -189,23 +189,28 @@ void PCA::load_baseline(std::string file_path/*="./baseline_distances.csv"*/) {
 */
 void PCA::offline_phase(Eigen::MatrixXd X,
                     bool strict_k/*=false*/, bool save_file/*=true*/, 
-                    std::string file_path/*="./baseline_distances.csv"*/) {
+                    std::string file_path/*="./baseline_distances.csv"*/,
+                    bool verbosity/*=false*/) {
     // sanity check
-    std::cout << "Starting offline phase" << std::endl;
+    assert(X.rows() == this->p);
 
+    if (verbosity) { std::cout << "Starting offline phase" << std::endl; }
+    
     assert(X.rows() == this->p);
 
     PCA::compute_subsets(X);
-    std::cout << "Subsets computed" << std::endl;
-
-    std::cout << "S1 cardinality " << S1.cols() << std::endl;
+    if (verbosity) {
+        std::cout << "Subsets computed" << std::endl;
+        std::cout << "S1 cardinality " << S1.cols() << std::endl;
+    }
     
     PCA::compute_pca();
-    std::cout << "Principal Components found\n";
-
-    std::cout << "Proceeding to baseline statistics\n";
+    if (verbosity) {
+        std::cout << "Principal Components found\n";
+        std::cout << "Proceeding to baseline statistics\n";
+    }
+    
     PCA::compute_baseline_distances();
-    std::cout << "Baseline distances calculated\n" << baseline_distances << std::endl;
     if (save_file) { PCA::save_baseline(file_path); }
 } /* offline_phase */
 
@@ -225,18 +230,15 @@ int PCA::characteristic_function(Eigen::VectorXd v, double scalar) {
 bool PCA::online_detection(Eigen::VectorXd sample) {
 
     bool anomaly_found = false;
-    Eigen::VectorXd S1_sample;
-    Eigen::VectorXd tmp_distances(this->N1);
     
     // calculate residual term for the sample
-    double residual_term= 0.5;
-    
+    double residual_term = (this->res_proj * (sample - this->baseline_mean_vector)).squaredNorm();
     double tail_probability;
 
     // compute probability
-    tail_probability = ((double)characteristic_function(this->baseline_distances, residual_term)) / N2;
+    tail_probability = double(characteristic_function(this->baseline_distances, residual_term)) / double(N2);
     if (tail_probability == 0.0) { // special case check
-        tail_probability = (double) 1 / N2;
+        tail_probability = double(1 / N2);
     }
 
     // CUSUM

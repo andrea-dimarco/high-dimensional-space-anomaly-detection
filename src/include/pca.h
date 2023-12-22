@@ -53,7 +53,9 @@ public:
 
     Eigen::MatrixXd compute_covariance_matrix();
 
-    void offline_phase(Eigen::MatrixXd X, bool strict_k=false, bool save_file=true, std::string file_path="./baseline_distances.csv");
+    void offline_phase(Eigen::MatrixXd X, bool strict_k=false,
+                        bool save_file=true, std::string file_path="./baseline_distances.csv",
+                        bool verbosity=false);
 
     // return true if anomaly found
     bool online_detection(Eigen::VectorXd sample);
