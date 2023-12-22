@@ -1,8 +1,9 @@
 TODO:
-- PCA flags regular datasets as anomalies -> ???
-- GEM flags regular datasets as anomalies -> fix h
+- PCA flags regular datasets as anomalies -> hyperparameters?
+- GEM flags regular datasets as anomalies -> hyperparameters!
 - verbosity for GEM
-- GEM does not recognize a change in the distriution!!
+- GEM does not recognize a change in the distributions
+- PCA does not recognize a change in the distributions
 
 FUTURE DEVELOPEMENT
 - detect mean change 

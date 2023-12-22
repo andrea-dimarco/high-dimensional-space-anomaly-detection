@@ -83,30 +83,38 @@ int main()
     // // p = X.rows(); N = X.cols();
     // // std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
-    model.offline_phase(X);
-    // // duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    // // std::cout<<"Duration: "<< duration << "s" << std::endl;
-    // std::cout << "Offline phase done!!" << std::endl;
+    //model.offline_phase(X);
+    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    std::cout << "Duration: " << duration << "s" << std::endl;
+    std::cout << "Offline phase done!!" << std::endl;
 
     // // // GEM Online phase
-    X = random_dataset(p, N, false/*normal*/); // anomalous dataset
+    //X = random_dataset(p, N, false/*normal*/); // anomalous dataset
     // X = suv.open_data("datasets/anomaly-human-activity.csv"); // anomaly!!
     p = X.rows(); N = X.cols();
     std::cout << "Anomalous samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
     std::cout << "Begin online phase..." << std::endl;
+    //std::cout << X.col(539) << std::endl;
+    std::cout << X.col(95) << std::endl; // <- With PCA this goes to inf and anomaly is detected p=10, N=1000;
     model.load_model();
     double max_confidence = 0.0;
-    for (int i = 0; i < N; i++) {
-        std::cout << "Current confidence: " << model.get_g() << std::endl;
+    int anomaly_count = 0;
+    for (int i = 94; i < N; i++) {
+        // std::cout << "Current confidence: " << model.get_g() << std::endl;
         if (model.get_g() > max_confidence) {
             max_confidence = model.get_g();
         }
         // anomaly detection
         if (model.online_detection(X.col(i))) {
-            std::cout << "Anomaly found with delay (" << (i-tau) << ") and confidence (" << model.get_g() << ")" << std::endl;
+            anomaly_count++;
+            std::cout << anomaly_count << " anomaly found with delay (" << (i-tau) << ") and confidence (" << model.get_g() << ")" << std::endl;
             std::cout << "Past max confidence reached is: " << max_confidence << std::endl;
-            return 0;
+            if (model.get_g() > max_confidence) {
+                max_confidence = model.get_g();
+            }
+            //return 0;
+            model.reset_g();
         }
     }
     std::cout << "No anomaly found. Current confidence is: " << model.get_g() << std::endl;
