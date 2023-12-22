@@ -1,7 +1,7 @@
 TODO:
-- save and load PCA models
+- PCA flags regular datasets as anomalies -> ???
+- GEM flags regular datasets as anomalies -> fix h
 - verbosity for GEM
-- optimize PCA memory
 - GEM does not recognize a change in the distriution!!
 
 FUTURE DEVELOPEMENT

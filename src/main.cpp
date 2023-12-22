@@ -54,7 +54,7 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
-    int p = 100; // output dimension
+    int p = 10; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.
 
@@ -62,7 +62,7 @@ int main()
 
     // the model is unkown so must be simulated as i.i.d. variables
 
-    int N = 10000; // number of samples in the nominal data set (data guaranteed to have no anomalies)
+    int N = 1000; // number of samples in the nominal data set (data guaranteed to have no anomalies)
 
     // testing area
     std::clock_t start;
@@ -72,40 +72,44 @@ int main()
     Eigen::MatrixXd X = random_dataset(p, N, false/*normal*/); // nominal dataset
 
     SUV suv;
-     
-    //GEM gem(p);
 
-    PCA pca(p);
+    PCA model(p);
     std::cout << "Samples loaded" << std::endl;
 
-    pca.offline_phase(X);
+    //model.offline_phase(X);
     std::cout << "Finished PCA offline phase" << std::endl;
 
     // // X = suv.open_data("datasets/nominal-human-activity.csv");
     // // p = X.rows(); N = X.cols();
-    // // GEM gem(p);
     // // std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
-    // gem.offline_phase(X);
+    model.offline_phase(X);
     // // duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     // // std::cout<<"Duration: "<< duration << "s" << std::endl;
     // std::cout << "Offline phase done!!" << std::endl;
 
     // // // GEM Online phase
-    X.row(0) = random_dataset(1, N, false/*normal*/, 2.0, 2.0); // anomalous dataset
+    X = random_dataset(p, N, false/*normal*/); // anomalous dataset
     // X = suv.open_data("datasets/anomaly-human-activity.csv"); // anomaly!!
     p = X.rows(); N = X.cols();
     std::cout << "Anomalous samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
 
     std::cout << "Begin online phase..." << std::endl;
-    //pca.load_model();
+    model.load_model();
+    double max_confidence = 0.0;
     for (int i = 0; i < N; i++) {
+        std::cout << "Current confidence: " << model.get_g() << std::endl;
+        if (model.get_g() > max_confidence) {
+            max_confidence = model.get_g();
+        }
         // anomaly detection
-        if (pca.online_detection(X.col(i))) {
-            std::cout << "Anomaly found with delay: " << (i-tau) << "!!" << std::endl;
+        if (model.online_detection(X.col(i))) {
+            std::cout << "Anomaly found with delay (" << (i-tau) << ") and confidence (" << model.get_g() << ")" << std::endl;
+            std::cout << "Past max confidence reached is: " << max_confidence << std::endl;
             return 0;
         }
     }
-    std::cout << "No anomaly found." << std::endl;
+    std::cout << "No anomaly found. Current confidence is: " << model.get_g() << std::endl;
+    std::cout << "Max confidence reached is: " << max_confidence << std::endl;
     return 0;
 } /* main */

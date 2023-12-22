@@ -87,6 +87,9 @@ Eigen::MatrixXd GEM::get_baseline_distances() {
 void GEM::reset_g() {
     this->g = 0.0;
 }
+double GEM::get_g() {
+    return this->g;
+}
 /**
  * Changes the stored h value representing the threshold for the anomaly detection.
 */
@@ -320,6 +323,7 @@ bool GEM::online_detection(Eigen::VectorXd sample) {
 
     // CUSUM
     this->g += log(this->alpha / tail_probability);
+    this->g = GEM::ReLU(this->g);
 
     // anomaly check
     if (this->g >= this->h) {

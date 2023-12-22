@@ -25,7 +25,7 @@ private:
     double h;        // anomaly detection threshold
     
 public:
-    GEM(int p, int k=4, double alpha=0.2, double h=5.0);
+    GEM(int p, int k=4, double alpha=0.2, double h=7.5);
 
     double euclidean_dist(Eigen::VectorXd p1, Eigen::VectorXd p2);
 
@@ -37,6 +37,7 @@ public:
     Eigen::MatrixXd get_baseline_distances();
 
     void reset_g();
+    double get_g();
     void set_h(double h);
     void set_alpha(double alpha);
 
