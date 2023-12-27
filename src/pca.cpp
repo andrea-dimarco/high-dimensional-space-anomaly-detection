@@ -374,7 +374,18 @@ void PCA::load_model(std::string baseline_path/*="./baseline_distances.csv"*/,
 void PCA::reset_g() {
     this->g = 0.0;
 }
-
 double PCA::get_g() {
     return this->g;
+}
+void PCA::set_alpha(double alpha) {
+    this->alpha = alpha;
+}
+double PCA::get_alpha() {
+    return this->alpha;
+}
+void PCA::set_h(double h) {
+    this->h = h;
+}
+double PCA::get_h() {
+    return this->h;
 }

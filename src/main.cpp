@@ -13,6 +13,8 @@
 
 #include <Eigen/Dense>
 
+//#include <python.h>
+
 /**
  * Generate a matrix of random values given 5 parameters
  * Dimension on x axis,
@@ -54,6 +56,11 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
  */
 int main()
 {
+
+    // Py_Initialize();
+    // PyRun_SimpleString("print('hello world')");
+    // Py_Finalize();
+    // return 0;
     int p = 10; // output dimension
     // sensors are not independent within eachother at time t
     // different samples taken ad different times t and t' are i.i.d.

@@ -47,6 +47,12 @@ public:
     double get_g();
     void reset_g();
 
+    void set_alpha(double alpha);
+    double get_alpha();
+
+    void set_h(double h);
+    double get_h();
+
     void save_baseline(std::string file_path="./baseline_distances.csv");
     void load_baseline(std::string file_path="./baseline_distances.csv");
 

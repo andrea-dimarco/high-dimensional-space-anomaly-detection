@@ -102,6 +102,12 @@ void GEM::set_h(double h) {
 void GEM::set_alpha(double alpha) {
     this->alpha = alpha;
 }
+double GEM::get_alpha() {
+    return this->alpha;
+}
+double GEM::get_h() {
+    return this->h;
+}
 
 /**
  * Computes the k Nearest Neighbors of the set S2 in the set S1.

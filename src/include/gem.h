@@ -38,8 +38,10 @@ public:
 
     void reset_g();
     double get_g();
-    void set_h(double h);
     void set_alpha(double alpha);
+    double get_alpha();
+    void set_h(double h);
+    double get_h();
 
     double kNN(Eigen::MatrixXd S2, bool is_offline=false);
 

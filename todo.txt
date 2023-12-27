@@ -4,6 +4,7 @@ TODO:
 - verbosity for GEM
 - GEM does not recognize a change in the distributions
 - PCA does not recognize a change in the distributions
+- use a BBO ptimization method (Nevergrad or NOMAD)
 
 FUTURE DEVELOPEMENT
 - detect mean change 
