@@ -9,11 +9,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <assert.h>
-#include <ctime>
+#include <fstream>
 
 #include <Eigen/Dense>
-
-//#include <python.h>
 
 /**
  * Generate a matrix of random values given 5 parameters
@@ -51,80 +49,164 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2, bool is_uniform=true, dou
     return dataset;
 } /* random_dataset */
 
-/**
- * Main function of our SUV.
- */
-int main()
-{
+double GEM_objective_function(GEM model, double h, double alpha, Eigen::MatrixXd X) {
 
-    // Py_Initialize();
-    // PyRun_SimpleString("print('hello world')");
-    // Py_Finalize();
-    // return 0;
-    int p = 10; // output dimension
-    // sensors are not independent within eachother at time t
-    // different samples taken ad different times t and t' are i.i.d.
-
-    int tau = 0; // change-point (when the anomaly begins)
-
-    // the model is unkown so must be simulated as i.i.d. variables
-
-    int N = 1000; // number of samples in the nominal data set (data guaranteed to have no anomalies)
-
-    // testing area
-    std::clock_t start;
-    double duration;
-    start = std::clock();
-
-    Eigen::MatrixXd X = random_dataset(p, N, false/*normal*/); // nominal dataset
-
-    SUV suv;
-
-    PCA model(p);
-    std::cout << "Samples loaded" << std::endl;
-
-    //model.offline_phase(X);
-    std::cout << "Finished PCA offline phase" << std::endl;
-
-    // // X = suv.open_data("datasets/nominal-human-activity.csv");
-    // // p = X.rows(); N = X.cols();
-    // // std::cout << "Nominal samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
-
-    //model.offline_phase(X);
-    duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    std::cout << "Duration: " << duration << "s" << std::endl;
-    std::cout << "Offline phase done!!" << std::endl;
-
-    // // // GEM Online phase
-    //X = random_dataset(p, N, false/*normal*/); // anomalous dataset
-    // X = suv.open_data("datasets/anomaly-human-activity.csv"); // anomaly!!
-    p = X.rows(); N = X.cols();
-    std::cout << "Anomalous samples loaded!!" << std::endl << "Dimension: " << p << std::endl << "Samples: " << N << std::endl;
-
-    std::cout << "Begin online phase..." << std::endl;
-    //std::cout << X.col(539) << std::endl;
-    std::cout << X.col(95) << std::endl; // <- With PCA this goes to inf and anomaly is detected p=10, N=1000;
-    model.load_model();
-    double max_confidence = 0.0;
+    double loss = 0;
+    int N = X.cols(); // number of samples
     int anomaly_count = 0;
-    for (int i = 94; i < N; i++) {
-        // std::cout << "Current confidence: " << model.get_g() << std::endl;
-        if (model.get_g() > max_confidence) {
-            max_confidence = model.get_g();
-        }
+    
+    for (int i = 0; i < N; i++) {
         // anomaly detection
         if (model.online_detection(X.col(i))) {
+            //std::cout << anomaly_count << " anomalies found." << std::endl;
             anomaly_count++;
-            std::cout << anomaly_count << " anomaly found with delay (" << (i-tau) << ") and confidence (" << model.get_g() << ")" << std::endl;
-            std::cout << "Past max confidence reached is: " << max_confidence << std::endl;
-            if (model.get_g() > max_confidence) {
-                max_confidence = model.get_g();
-            }
-            //return 0;
             model.reset_g();
         }
     }
-    std::cout << "No anomaly found. Current confidence is: " << model.get_g() << std::endl;
-    std::cout << "Max confidence reached is: " << max_confidence << std::endl;
+
+    double FAR = double(anomaly_count) / double(N); // probability of 
+    loss = FAR;
+
+    return loss;
+}
+
+double PCA_objective_function(PCA model, double h, double alpha, Eigen::MatrixXd X) {
+
+    double loss = 0;
+    int N = X.cols(); // number of samples
+    int anomaly_count = 0;
+    
+    for (int i = 0; i < N; i++) {
+        // anomaly detection
+        if (model.online_detection(X.col(i))) {
+            //std::cout << anomaly_count << " anomalies found." << std::endl;
+            anomaly_count++;
+            model.reset_g();
+        }
+    }
+
+    double FAR = double(anomaly_count) / double(N); // probability of 
+    loss = FAR;
+
+    return loss;
+}
+
+/**
+ * Generate an Eigen matrix out of a previously populated file from the save_data() function
+*/
+Eigen::MatrixXd load_data(std::string file_path) {
+	
+	// the input is the file: "fileToOpen.csv":
+	// a,b,c
+	// d,e,f
+	// This function converts input file data into the Eigen matrix format
+
+	// the matrix entries are stored in this variable row-wise. For example if we have the matrix:
+	// M=[a b c 
+	//	  d e f]
+	// the entries are stored as matrixEntries=[a,b,c,d,e,f], that is the variable "matrixEntries" is a row vector
+	// later on, this vector is mapped into the Eigen matrix format
+	std::vector<double> matrixEntries;
+	
+	std::ifstream matrixDataFile(file_path); // store the data from the matrix
+	std::string matrixRowString; // store the row of the matrix that contains commas 
+	std::string matrixEntry; // store the matrix entry
+
+	// this variable is used to track the number of rows
+	int matrixRowNumber = 0;
+
+	while (std::getline(matrixDataFile, matrixRowString)) // here we read a row by row of matrixDataFile and store every line into the string variable matrixRowString
+	{
+		std::stringstream matrixRowStringStream(matrixRowString); //convert matrixRowString that is a string to a stream variable.
+
+		while (std::getline(matrixRowStringStream, matrixEntry,',')) // here we read pieces of the stream matrixRowStringStream until every comma, and store the resulting character into the matrixEntry
+		{
+			matrixEntries.push_back(std::stod(matrixEntry));   //here we convert the string to double and fill in the row vector storing all the matrix entries
+		}
+		matrixRowNumber++; //update the column numbers
+	}
+	// here we conver the vector variable into the matrix and return the resulting object, 
+	// note that matrixEntries.data() is the pointer to the first memory location at which the entries of the vector matrixEntries are stored;
+	return Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> (matrixEntries.data(), matrixRowNumber, matrixEntries.size() / matrixRowNumber);
+}
+
+/**
+ * Main function
+ */
+int main(int argc, char *argv[])
+{
+    bool use_GEM = false;
+    double h = 5.0;
+    double alpha = 0.2;
+    bool is_offline = true;
+    bool load = false; 
+    std::string dataset_path;
+    int p = 10;
+    int N = 1000;
+
+    // load arguments
+    if(argc > 1) {
+        if (*argv[1] == 'y') { use_GEM = true; }
+        else { use_GEM = false; }
+
+        if (argc > 2) { h = atof(argv[2]); }
+        if (argc > 3) { alpha = atof(argv[3]); }
+
+        if (argc > 4) {
+            if (*argv[4] == 'y') { is_offline = true; }
+            else { is_offline = false; }
+        }
+        if (argc > 5) {
+            if (*argv[5] == 'y') { load = true; }
+            else { load = false; }
+        }
+        if (load) { if (argc > 6) { dataset_path = std::string(argv[6]); } }
+        else {
+            if (argc > 6) { p = atoi(argv[6]); }
+            if (argc > 7) { N = atoi(argv[7]); }
+        }
+    }
+
+    // Load in dataset
+    Eigen::MatrixXd X;
+    if (load) {
+        X = load_data(dataset_path);
+        p = X.rows(); N = X.cols();
+    } else { // generate a random dataset
+        X = random_dataset(p, N, false);
+    }
+
+    double loss;
+    // Run model
+    if (use_GEM) {
+        GEM gem(p);
+        if (is_offline) {
+            gem.offline_phase(X);
+            return 0;
+        } else { // online phase
+            gem.load_model();
+            gem.set_h(h);
+            gem.set_alpha(alpha);
+            loss = GEM_objective_function(gem, h, alpha, X);
+        }
+    } else {
+        PCA pca(p);
+        if (is_offline) {
+            pca.offline_phase(X);
+            return 0;
+        } else { // online phase
+            pca.load_model();
+            pca.set_h(h);
+            pca.set_alpha(alpha);
+            loss = PCA_objective_function(pca, h, alpha, X);
+        }
+    } 
+
+    // save results
+    std::ofstream myfile;
+    myfile.open("loss.txt");
+    myfile << loss;
+    myfile.close();
+
     return 0;
 } /* main */

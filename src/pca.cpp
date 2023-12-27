@@ -47,11 +47,11 @@ void PCA::compute_pca(Eigen::MatrixXd S1) {
 
     // compute the sample data mean vector
     this->baseline_mean_vector = S1.rowwise().mean(); // mean for every feature (column wise)
-    std::cout << "Sample data mean computed" << std::endl;
+    // std::cout << "Sample data mean computed" << std::endl;
 
     // get the sample data covariance matrix
     Eigen::MatrixXd covariance_matrix = PCA::compute_covariance_matrix(S1);
-    std::cout << "Covariance matrix computed." << std::endl;
+    // std::cout << "Covariance matrix computed." << std::endl;
     // calculate eigen vectors and eigen vlaues
 
     // define matrix for eigenvalues and eigenvectors
@@ -59,7 +59,7 @@ void PCA::compute_pca(Eigen::MatrixXd S1) {
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> eigen_value_solver(covariance_matrix);
     Eigen::VectorXd eigen_values_vector = eigen_value_solver.eigenvalues().real().col(0);
     Eigen::MatrixXd eigen_vector_matrix = eigen_value_solver.eigenvectors().real();
-    std::cout << "Eigen components found." << std::endl;
+    // std::cout << "Eigen components found." << std::endl;
 
     // based on gamma derive optimal r (subdimension value) 
     double sum_eigenvalues = eigen_values_vector.sum();
@@ -75,7 +75,7 @@ void PCA::compute_pca(Eigen::MatrixXd S1) {
             break;
         }
     }
-    std::cout << "Found best subdimension r: " << optimal_subdimension << std::endl;
+    // std::cout << "Found best subdimension r: " << optimal_subdimension << std::endl;
 
     // get V = the eigen vectors corresponding to the r largest eigenvalues
     // we take every row but only the r (= optimal dimension) rightmost columns
