@@ -227,7 +227,7 @@ bool PCA::online_detection(Eigen::VectorXd sample) {
     // compute probability
     tail_probability = double(characteristic_function(this->baseline_distances, residual_term)) / double(this->N2);
     if (tail_probability == 0.0) { // special case check
-        tail_probability = double(1 / this->N2);
+        tail_probability = 1.0 / this->N2;
     }
 
     // CUSUM
