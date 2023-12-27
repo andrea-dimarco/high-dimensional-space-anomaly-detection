@@ -1,10 +1,7 @@
 TODO:
-- PCA flags regular datasets as anomalies -> hyperparameters?
-- GEM flags regular datasets as anomalies -> hyperparameters!
-- verbosity for GEM
 - GEM does not recognize a change in the distributions
 - PCA does not recognize a change in the distributions
-- use a BBO ptimization method (Nevergrad or NOMAD)
+- insert python script for BBO
 
 FUTURE DEVELOPEMENT
 - detect mean change 
