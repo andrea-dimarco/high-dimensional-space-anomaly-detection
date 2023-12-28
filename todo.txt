@@ -1,9 +1,10 @@
 TODO:
-- GEM does not recognize a change in the distributions
-- PCA does not recognize a change in the distributions
-- insert python script for BBO
+- define test cases for all safe samples
+- define test cases for all anomalous samples
 
 FUTURE DEVELOPEMENT
+- GEM does not recognize a change in the distributions
+- PCA does not recognize a change in the distributions
 - detect mean change 
 - detect variance change 
 - detect change in both
