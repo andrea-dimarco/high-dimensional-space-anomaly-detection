@@ -1,12 +1,13 @@
 TODO:
 - define test cases for all safe samples
 - define test cases for all anomalous samples
+- choose nevergrad optimization algorithm (maybe Powell)
+- define objective function metric for black-box optimization
+- hyperparameter optimization
 
-FUTURE DEVELOPEMENT
+FUTURE DEVELOPEMENT:
 - GEM does not recognize a change in the distributions
 - PCA does not recognize a change in the distributions
 - detect mean change 
 - detect variance change 
 - detect change in both
-- hyperparameter optimization
-- a lot of online detections are found at delay 5417 (??)
