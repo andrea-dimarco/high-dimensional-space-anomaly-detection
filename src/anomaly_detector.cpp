@@ -204,11 +204,14 @@ int main(int argc, char *argv[])
         }
     } 
 
-    // save results
-    std::ofstream myfile;
-    myfile.open("loss.txt");
-    myfile << loss;
-    myfile.close();
+    // // save results <- This creates issues when parallelizing
+    // std::ofstream myfile;
+    // myfile.open("loss.txt");
+    // myfile << loss;
+    // myfile.close();
+
+    // return results
+    std::cout << loss;
 
     return 0;
 } /* main */

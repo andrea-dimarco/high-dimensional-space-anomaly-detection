@@ -4,6 +4,7 @@ TODO:
 - choose nevergrad optimization algorithm (maybe Powell)
 - define objective function metric for black-box optimization
 - hyperparameter optimization
+- parallelism with Threads or Processes (I think processes)
 
 FUTURE DEVELOPEMENT:
 - GEM does not recognize a change in the distributions
