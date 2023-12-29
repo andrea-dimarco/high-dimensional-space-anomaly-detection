@@ -12,3 +12,6 @@ FUTURE DEVELOPEMENT:
 - detect mean change 
 - detect variance change 
 - detect change in both
+
+NOTES:
+- GEM is way slower than PCA

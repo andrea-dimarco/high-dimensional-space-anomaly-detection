@@ -1,7 +1,8 @@
 import nevergrad as ng
 from concurrent import futures
 import os
-from subprocess import run
+import time
+
 
 '''
 This function performs the offline phase of the PCA model
@@ -37,9 +38,9 @@ This function performs the offline phase of the GEM model
 '''
 def gem_offline():
     global nominal_dataset
-    command = "./anomaly_detector y 1.0 1.0 n y {dataset}"
+    command = "./anomaly_detector y 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
-    print("PCA offline phase done.")
+    print("GEM offline phase done.")
 
 '''
 This function will call the PCA model and returns the loss value
@@ -51,16 +52,12 @@ def gem_online(h:float, alpha:float) -> float:
     command = "./anomaly_detector y {h} {alpha} n y {dataset}"
 
     # Check False Acceptance Rate
-    os.system(command.format(h=h, alpha=alpha, dataset=nominal_dataset))
-    with open ("loss.txt", 'r') as f:
-        FAR = float(f.readline())
-        f.close()
+    output = os.popen(command.format(h=h, alpha=alpha, dataset=nominal_dataset)).readlines()[0]
+    FAR = float(output)
 
     # Check False Rejection Rate
-    os.system(command.format(h=h, alpha=alpha, dataset=anomalous_dataset))
-    with open ("loss.txt", 'r') as f:
-        FRR = 1 - float(f.readline())
-        f.close()
+    output = os.popen(command.format(h=h, alpha=alpha, dataset=anomalous_dataset)).readlines()[0]
+    FRR = 1 - float(output)
     
     return FAR + FRR
 
@@ -69,10 +66,10 @@ def gem_online(h:float, alpha:float) -> float:
 '''
 Run the Black-Box Optimizer
 '''
-model             = "pca"
+model             = "gem"
 optimizer_name    = "NGOpt"
 nominal_dataset   = "./datasets/gaussian_0_1.csv" # safe samples
-anomalous_dataset = "./datasets/gaussian_1_1.csv" # anomalous samples
+anomalous_dataset = "./datasets/gaussian_0_2.csv" # anomalous samples
 
 num_workers       = 4
 num_iterations    = 250 * num_workers # write it as budget-per-worker
@@ -89,6 +86,7 @@ instrumentation = ng.p.Instrumentation(
 optimizer = ng.optimizers.registry[optimizer_name](instrumentation, budget=num_iterations, num_workers=num_workers)
 
 # do the job
+start_time = time.time()
 print("Begin offline Phase")
 
 if model == "pca":
@@ -108,5 +106,10 @@ else:
     os._exit(1)
 
 # visualize result
+print("\n--- %s seconds ---" % (time.time() - start_time))
+print("Model:", model)
+print("Offline phase:", nominal_dataset)
+print("Online phase: ", anomalous_dataset)
+print("Optimizer:", optimizer_name)
 print(recommendation.kwargs)
 os._exit(0)

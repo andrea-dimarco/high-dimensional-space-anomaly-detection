@@ -3,3 +3,5 @@ src/main
 .vscode/settings.json
 *.csv
 loss.txt
+src/suv.cpp
+src/include/suv.h

@@ -2,14 +2,10 @@
 
 #include "include/gem.h"
 #include "include/pca.h"
+
 #include <iostream>
-#include <assert.h>
 #include <random>
 #include <cstring>
-#include <cstdlib>
-#include <assert.h>
-#include <fstream>
-
 #include <Eigen/Dense>
 
 /**
@@ -24,8 +20,6 @@
 Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2,
                                 bool is_uniform=true, double a=0.0, double b=1.0,
                                 int seed=0) {
-    
-    assert((dim0>0) && (dim1>0));
 
     int i,j;
     std::default_random_engine prg(seed);
@@ -96,17 +90,7 @@ double PCA_objective_function(PCA model, double h, double alpha, Eigen::MatrixXd
  * Generate an Eigen matrix out of a previously populated file from the save_data() function
 */
 Eigen::MatrixXd load_data(std::string file_path) {
-	
-	// the input is the file: "fileToOpen.csv":
-	// a,b,c
-	// d,e,f
-	// This function converts input file data into the Eigen matrix format
 
-	// the matrix entries are stored in this variable row-wise. For example if we have the matrix:
-	// M=[a b c 
-	//	  d e f]
-	// the entries are stored as matrixEntries=[a,b,c,d,e,f], that is the variable "matrixEntries" is a row vector
-	// later on, this vector is mapped into the Eigen matrix format
 	std::vector<double> matrixEntries;
 	
 	std::ifstream matrixDataFile(file_path); // store the data from the matrix
@@ -126,8 +110,6 @@ Eigen::MatrixXd load_data(std::string file_path) {
 		}
 		matrixRowNumber++; //update the column numbers
 	}
-	// here we conver the vector variable into the matrix and return the resulting object, 
-	// note that matrixEntries.data() is the pointer to the first memory location at which the entries of the vector matrixEntries are stored;
 	return Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>> (matrixEntries.data(), matrixRowNumber, matrixEntries.size() / matrixRowNumber);
 }
 
