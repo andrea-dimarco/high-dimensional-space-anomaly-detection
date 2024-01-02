@@ -59,6 +59,12 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2,
 
 /**
  * Main function
+ * is_uniform : chooses if the distribution is uniform or Gaussian
+ * param1 : first parameter of the distribution (mean if gaussian, left bound if uniform)
+ * param2 : second parameter of the distribution (variance if gaussian, right bound if uniform)
+ * p : dimensionality of a sample 
+ * N : number of samples to generate
+ * dataset_path : the file in which to save the dataset
  */
 int main(int argc, char *argv[])
 {
