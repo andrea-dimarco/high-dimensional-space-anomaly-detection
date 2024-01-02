@@ -115,6 +115,15 @@ Eigen::MatrixXd load_data(std::string file_path) {
 
 /**
  * Main function
+ * Options and arguments:
+ * use_GEM : choose if the algorithm to be used is GEM or PCA based
+ * h : choose the detection threshold 
+ * alpha : choose the alpha for the summary statistics
+ * is_offline : choose if the model training should be done 
+ * load : choose if a dataset should be loaded or a new one created
+ * dataset_path : the path of the dataset to be loaded
+ * p : dimensionality of a sample for the dataset to be created
+ * N : number of samples of the dataset to be created   
  */
 int main(int argc, char *argv[])
 {
