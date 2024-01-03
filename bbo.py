@@ -83,13 +83,13 @@ def gem_online(h:float, alpha:float) -> float:
 '''
 Run the Black-Box Optimizer
 '''
-model             = "pca"
+model             = "gem"
 optimizer_name    = "NGOpt"
 nominal_dataset   = "./datasets/gaussian_0_1.csv" # safe samples
 anomalous_dataset = "./datasets/gaussian_1_1.csv" # anomalous samples
  
-num_workers       = 4
-num_iterations    = 500 * num_workers # write it as budget-per-worker
+num_workers       = 16
+num_iterations    = 125 * num_workers # write it as budget-per-worker
 
 # generate test script
 os.system("bash ./get_test_datasets.sh")
@@ -126,14 +126,17 @@ elif model == "gem":
 else:
     os._exit(1)
 
+# clean up datasets
+os.system("bash ./remove_test_datasets.sh")
+os.system("bash ./remove_garbage.sh")
 
 # save log
 res_string = "--- BBO took {time} seconds ---".format(time=(time.time()-start_time))
 res_string += "\nModel: {model}".format(model=model)
 res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
 res_string += "\nOnline phase:  {ads}".format(ads=anomalous_dataset)
-res_string += "\nOptimizer: {opt}\n".format(opt=optimizer_name)
-res_string += str(recommendation.kwargs) + '\n'
+res_string += "\nOptimizer: {opt}".format(opt=optimizer_name)
+res_string += "\nParameters: " + str(recommendation.kwargs) + "\nBest value: " + str(recommendation.loss) + '\n'
 
 print(res_string)
 
@@ -150,7 +153,7 @@ ax.plot(H, A, L, label='{model} Optimization Curve'.format(model=model))
 
 ax.set_xlabel('h') 
 ax.set_ylabel('alpha') 
-ax.set_zlabel('loss') 
+ax.set_zlabel('Loss') 
 
 plt.savefig('{model}_bbo_3d_graph.png'.format(model=model))
 plt.show()
