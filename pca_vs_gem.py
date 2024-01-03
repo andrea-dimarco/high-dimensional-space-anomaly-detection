@@ -106,7 +106,15 @@ for i in range(num_iterations):
     dimension_history.append(p)
     p += delta
 
+# save log
+res_string = "--- PCA vs GEM took {time} seconds ---".format(time=(time.time()-start_time))
+res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
+res_string += "\nOnline phase:  {ads}\n".format(ads=anomalous_dataset)
 
+print(res_string)
+
+with open ("./log.txt", 'a') as f:
+    f.write(res_string)
 
 # plotting the points  
 plt.plot(dimension_history, pca_anomaly_history, label="PCA") 

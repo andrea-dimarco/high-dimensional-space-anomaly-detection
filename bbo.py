@@ -127,8 +127,8 @@ else:
     os._exit(1)
 
 
-# visualize result
-res_string = "--- {time} seconds ---".format(time=(time.time()-start_time))
+# save log
+res_string = "--- BBO took {time} seconds ---".format(time=(time.time()-start_time))
 res_string += "\nModel: {model}".format(model=model)
 res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
 res_string += "\nOnline phase:  {ads}".format(ads=anomalous_dataset)
@@ -137,7 +137,7 @@ res_string += str(recommendation.kwargs) + '\n'
 
 print(res_string)
 
-with open ("./bbo_res.txt".format(model=model), 'a') as f:
+with open ("./log.txt", 'a') as f:
     f.write(res_string)
 
 

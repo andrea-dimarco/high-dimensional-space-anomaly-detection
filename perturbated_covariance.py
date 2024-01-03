@@ -121,6 +121,15 @@ for i in range(num_iterations):
     print(str(i+1) + ": " + str(anomalies_found) + " anomalies found for offset = " + str(round(offset, 2)))
     offset += delta
 
+# save log
+res_string = "--- Perturbation took {time} seconds ---".format(time=(time.time()-start_time))
+res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
+res_string += "\nOnline phase:  {ads}\n".format(ads=anomalous_dataset)
+
+print(res_string)
+
+with open ("./log.txt", 'a') as f:
+    f.write(res_string)
 
 # plotting the points  
 plt.plot(offset_history, anomaly_history) 
@@ -136,10 +145,3 @@ plt.title('{model} anomalies by perturbing the covariance'.format(model=model))
 # function to show the plot 
 plt.savefig("{model}_perturbated_covariance.png".format(model=model))
 plt.show()
-
-# visualize result
-print("\n--- %s seconds ---" % (time.time() - start_time))
-print("Model:", model)
-print("Offline phase:", nominal_dataset)
-print("Online phase: ", anomalous_dataset)
-os._exit(0)

@@ -119,6 +119,17 @@ for i in range(num_iterations):
     k += delta
 
 
+# save log
+res_string = "--- Linear Scale took {time} seconds ---".format(time=(time.time()-start_time))
+res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
+res_string += "\nOnline phase:  {ads}\n".format(ads=anomalous_dataset)
+
+print(res_string)
+
+with open ("./log.txt", 'a') as f:
+    f.write(res_string)
+
+
 # plotting the points  
 plt.plot(k_history, anomaly_history) 
   
@@ -133,10 +144,3 @@ plt.title('{model} anomalies with increasing variance'.format(model=model))
 # function to show the plot 
 plt.savefig("{model}_linear_scale_covariance.png".format(model=model))
 plt.show()
-
-# visualize result
-print("\n--- %s seconds ---" % (time.time() - start_time))
-print("Model:", model)
-print("Offline phase:", nominal_dataset)
-print("Online phase: ", anomalous_dataset)
-os._exit(0)
