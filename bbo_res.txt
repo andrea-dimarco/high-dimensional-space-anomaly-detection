@@ -1,0 +1,18 @@
+--- 8.664549589157104 seconds ---
+Model: pca
+Offline phase: ./datasets/gaussian_0_1.csv
+Online phase:  ./datasets/gaussian_1_1.csv
+Optimizer: NGOpt
+{'h': 3.311536841058871, 'alpha': 0.08724524342974656}
+--- 10.916723012924194 seconds ---
+Model: pca
+Offline phase: ./datasets/gaussian_0_1.csv
+Online phase:  ./datasets/gaussian_1_1.csv
+Optimizer: NGOpt
+{'h': 2.985372978969879, 'alpha': 0.06907649257560261}
+--- 5.241833448410034 seconds ---
+Model: pca
+Offline phase: ./datasets/gaussian_0_1.csv
+Online phase:  ./datasets/gaussian_1_1.csv
+Optimizer: NGOpt
+{'h': 3.590948478784707, 'alpha': 0.09652089058996527}

@@ -4,6 +4,10 @@ import os
 import time
 
 
+import numpy as np
+from matplotlib import pyplot as plt
+
+
 '''
 This function performs the offline phase of the PCA model
 '''
@@ -22,6 +26,9 @@ def pca_online(h:float, alpha:float) -> float:
     global anomalous_dataset
     command = "./anomaly_detector n {h} {alpha} n y {dataset}"
 
+    w1 = 0.4
+    w2 = 0.6
+
     # Check False Acceptance Rate
     output = os.popen(command.format(h=h, alpha=alpha, dataset=nominal_dataset)).readlines()[0]
     FAR = float(output)
@@ -29,8 +36,12 @@ def pca_online(h:float, alpha:float) -> float:
     # Check False Rejection Rate
     output = os.popen(command.format(h=h, alpha=alpha, dataset=anomalous_dataset)).readlines()[0]
     FRR = 1 - float(output)
+
+    loss = w1*FAR + w2*FRR
     
-    return FAR + FRR
+    global history
+    history.append((loss, h, alpha))
+    return loss
 
 
 '''
@@ -51,6 +62,9 @@ def gem_online(h:float, alpha:float) -> float:
     global anomalous_dataset
     command = "./anomaly_detector y {h} {alpha} n y {dataset}"
 
+    w1 = 0.4
+    w2 = 0.6
+
     # Check False Acceptance Rate
     output = os.popen(command.format(h=h, alpha=alpha, dataset=nominal_dataset)).readlines()[0]
     FAR = float(output)
@@ -58,21 +72,27 @@ def gem_online(h:float, alpha:float) -> float:
     # Check False Rejection Rate
     output = os.popen(command.format(h=h, alpha=alpha, dataset=anomalous_dataset)).readlines()[0]
     FRR = 1 - float(output)
-    
-    return FAR + FRR
 
+    loss = w1*FAR + w2*FRR
+    
+    global history
+    history.append((loss, h, alpha))
+    return loss
 
 
 '''
 Run the Black-Box Optimizer
 '''
-model             = "gem"
+model             = "pca"
 optimizer_name    = "NGOpt"
 nominal_dataset   = "./datasets/gaussian_0_1.csv" # safe samples
-anomalous_dataset = "./datasets/gaussian_0_2.csv" # anomalous samples
-
+anomalous_dataset = "./datasets/gaussian_1_1.csv" # anomalous samples
+ 
 num_workers       = 4
-num_iterations    = 250 * num_workers # write it as budget-per-worker
+num_iterations    = 500 * num_workers # write it as budget-per-worker
+
+# generate test script
+os.system("bash ./get_test_datasets.sh")
 
 #      h     alpha
 lb = [ 1.0,  0.01] # lower-bound
@@ -86,6 +106,7 @@ instrumentation = ng.p.Instrumentation(
 optimizer = ng.optimizers.registry[optimizer_name](instrumentation, budget=num_iterations, num_workers=num_workers)
 
 # do the job
+history = []
 start_time = time.time()
 print("Begin offline Phase")
 
@@ -105,11 +126,31 @@ elif model == "gem":
 else:
     os._exit(1)
 
+
 # visualize result
-print("\n--- %s seconds ---" % (time.time() - start_time))
-print("Model:", model)
-print("Offline phase:", nominal_dataset)
-print("Online phase: ", anomalous_dataset)
-print("Optimizer:", optimizer_name)
-print(recommendation.kwargs)
-os._exit(0)
+res_string = "--- {time} seconds ---".format(time=(time.time()-start_time))
+res_string += "\nModel: {model}".format(model=model)
+res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
+res_string += "\nOnline phase:  {ads}".format(ads=anomalous_dataset)
+res_string += "\nOptimizer: {opt}\n".format(opt=optimizer_name)
+res_string += str(recommendation.kwargs) + '\n'
+
+print(res_string)
+
+with open ("./bbo_res.txt".format(model=model), 'a') as f:
+    f.write(res_string)
+
+
+# plot the super graph
+history.sort(key=lambda x: x[0])
+L, H, A = zip(*history)
+
+ax = plt.figure().add_subplot(projection='3d')
+ax.plot(H, A, L, label='{model} Optimization Curve'.format(model=model))
+
+ax.set_xlabel('h') 
+ax.set_ylabel('alpha') 
+ax.set_zlabel('loss') 
+
+plt.savefig('{model}_bbo_3d_graph.png'.format(model=model))
+plt.show()
