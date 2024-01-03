@@ -5,3 +5,4 @@ src/main
 loss.txt
 src/suv.cpp
 src/include/suv.h
+*.png

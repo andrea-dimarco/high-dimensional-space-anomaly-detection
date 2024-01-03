@@ -1,18 +1,7 @@
 TODO:
-- define test cases for all safe samples
-- define test cases for all anomalous samples
-- choose nevergrad optimization algorithm (maybe Powell)
-- define objective function metric for black-box optimization
 - hyperparameter optimization
-- parallelism with Threads or Processes (I think processes)
-- do experiments and plot graphs
+- do experiments
 
 FUTURE DEVELOPEMENT:
 - GEM does not recognize a change in the distributions
 - PCA does not recognize a change in the distributions
-- detect mean change 
-- detect variance change 
-- detect change in both
-
-NOTES:
-- GEM is way slower than PCA
