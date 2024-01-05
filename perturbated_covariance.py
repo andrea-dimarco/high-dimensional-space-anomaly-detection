@@ -105,7 +105,6 @@ anomaly_history = []
 noise_history = []
 for i in range(num_iterations):
     #create perturbated covariance matrix with null diagonal
-    #TODO: issue with negative value (clamp with minimum element of matrix and noise?)
     noise_matrix = np.random.uniform(0,noise,size=(p,p))
     noise_matrix = (noise_matrix + noise_matrix.T) / 2
     np.fill_diagonal(noise_matrix,0)
