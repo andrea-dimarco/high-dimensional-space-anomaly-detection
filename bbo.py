@@ -85,10 +85,10 @@ Run the Black-Box Optimizer
 '''
 model             = "gem"
 optimizer_name    = "NGOpt"
-nominal_dataset   = "./datasets/gaussian_0_1.csv" # safe samples
-anomalous_dataset = "./datasets/gaussian_1_1.csv" # anomalous samples
+nominal_dataset   = "./datasets/nominal-human-activity.csv" # safe samples
+anomalous_dataset = "./datasets/anomaly-human-activity.csv" # anomalous samples
  
-num_workers       = 16
+num_workers       = 4
 num_iterations    = 125 * num_workers # write it as budget-per-worker
 
 # generate test script

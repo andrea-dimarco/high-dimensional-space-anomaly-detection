@@ -6,5 +6,6 @@
 # test
 ./generate_dataset n 0.0 2.0 10 10000 ./datasets/gaussian_0_2.csv
 ./generate_dataset n 1.0 1.0 10 10000 ./datasets/gaussian_1_1.csv
+./generate_dataset n 0.5 0.5 10 10000 ./datasets/gaussian_05_05.csv
 
 ./generate_dataset y 1.0 1.0 10 10000 ./datasets/uniform_1_1.csv
