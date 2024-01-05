@@ -67,7 +67,7 @@ model = "pca"
 alpha = 0.1
 h = 2
 
-offset = 0.1
+noise = 0.1
 delta = 0.1
 num_trials = 2
 num_iterations = 500
@@ -104,9 +104,13 @@ start_time = time.time()
 anomaly_history = []
 offset_history = []
 for i in range(num_iterations):
-    # save dataset
-    cov_2 = cov_1 + np.random.uniform(mean-offset, mean+offset, (p,p))
-    df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=cov_2, size=N2).transpose())
+    #create perturbated covariance matrix with null diagonal
+    #TODO: issue with negative value (clamp with minimum element of matrix and noise?)
+    noise_matrix = np.random.uniform(-noise,noise,size=(p,p))
+    noise_matrix = (noise_matrix + noise_matrix.T) / 2
+    np.fill_diagonal(noise_matrix,0)
+    noisy_cov = cov_1 + noise_matrix
+    df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=noisy_cov, size=N2).transpose())
     df.to_csv(anomalous_dataset, index=False, header=False)
 
     # run model
@@ -117,9 +121,9 @@ for i in range(num_iterations):
 
     anomalies_found = int(N2 * anomaly_rate)
     anomaly_history.append(anomalies_found)
-    offset_history.append(offset)
-    print(str(i+1) + ": " + str(anomalies_found) + " anomalies found for offset = " + str(round(offset, 2)))
-    offset += delta
+    offset_history.append(noise)
+    print(str(i+1) + ": " + str(anomalies_found) + " anomalies found for offset = " + str(round(noise, 2)))
+    noise += delta
 
 # save log
 res_string = "--- Perturbation took {time} seconds ---".format(time=(time.time()-start_time))
