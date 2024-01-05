@@ -58,7 +58,7 @@ def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
 # parameters
 p = 1       # data dimension
-N1 = 500    # Number of samples to generate for training
+N1 = 1000    # Number of samples to generate for training
 N2 = N1 * 2 # Nnmber of samples to generate for testing
 
 nominal_mean = 0.0
@@ -101,6 +101,9 @@ for i in range(num_iterations):
     pca_anomaly_history.append(pca_anomaly_rate)
     gem_anomaly_history.append(gem_anomaly_rate)
     dimension_history.append(p)
+
+    print("{i}: gem={gem} pca={pca}".format(i=i, gem=gem_anomaly_rate, pca=pca_anomaly_rate))
+    
     p += delta
 
 # save log
@@ -127,7 +130,7 @@ plt.title('Anomalies with increasing dimensions')
   
 # function to show the plot 
 plt.legend() 
-plt.savefig("pca_vs_gem_dim.png")
+plt.savefig("pca_vs_gem_dim_iid.png")
 plt.show()
 
 os._exit(0)

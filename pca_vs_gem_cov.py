@@ -11,7 +11,6 @@ def pca_offline():
     global nominal_dataset
     command = "./anomaly_detector n 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
-    print("PCA offline phase done.")
 
 '''
 This function will call the PCA model and returns the loss value
@@ -38,7 +37,6 @@ def gem_offline():
     global nominal_dataset
     command = "./anomaly_detector y 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
-    print("GEM offline phase done.")
 
 '''
 This function will call the PCA model and returns the loss value
@@ -64,13 +62,15 @@ N1 = 1000    # Number of samples to generate for training
 N2 = N1 * 2 # Nnmber of samples to generate for testing
 model = "pca"
 
-alpha = 0.1
-h = 2
+gem_alpha = 0.1
+gem_h = 2
+pca_alpha = 0.1
+pca_h = 2
 
-k = 1
-delta = 0.01
-num_trials = 5
-num_iterations = 500
+noise = 0.1
+delta = 0.1
+num_trials = 2
+num_iterations = 50
 
 # mean vector
 mean = 0.0
@@ -79,10 +79,11 @@ mu = np.zeros(p)
 # covariance matrixes
 cov_1 = np.eye(p)
 
+
 # files
 file_path = "./datasets/"
-nominal_dataset = file_path + "exp_1_train.csv"
-anomalous_dataset = file_path + "exp_1_test.csv"
+nominal_dataset = file_path + "exp_2_train.csv"
+anomalous_dataset = file_path + "exp_2_test.csv"
 
 # Generate samples from multivariate normal distribution
 training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N1).transpose()
@@ -92,35 +93,38 @@ df = pd.DataFrame(training_data)
 df.to_csv(nominal_dataset, index=False, header=False)
 del training_data
 
-# train model
-if model == "pca":
-    pca_offline()
-else:
-    gem_offline()
 
 # do the experiments
 start_time = time.time()
-anomaly_history = []
-k_history = []
+pca_anomaly_history = []
+gem_anomaly_history = []
+noise_history = []
 for i in range(num_iterations):
-    # save dataset
-    df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=k*cov_1, size=N2).transpose())
+    #create perturbated covariance matrix with null diagonal
+    noise_matrix = np.random.uniform(0,noise,size=(p,p))
+    noise_matrix = (noise_matrix + noise_matrix.T) / 2
+    np.fill_diagonal(noise_matrix,0)
+    noisy_cov = cov_1 + noise_matrix
+    df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=noisy_cov, size=N2).transpose())
     df.to_csv(anomalous_dataset, index=False, header=False)
-    # run model
-    if model == "pca":
-        anomaly_rate = pca_online(h, alpha, num_trials)
-    else:
-        anomaly_rate = gem_online(h, alpha, num_trials)
 
-    anomalies_found = int(N2 * anomaly_rate)
-    anomaly_history.append(anomaly_rate)
-    k_history.append(delta*i)
-    print(str(i) + ": " + str(anomalies_found) + " anomalies found for k = " + str(round(k, 2)))
-    k += delta
+    # run models
+    pca_offline()
+    pca_anomaly_rate = pca_online(pca_h, pca_alpha, num_trials)
+    
+    gem_offline()
+    gem_anomaly_rate = gem_online(gem_h, gem_alpha, num_trials)
 
+    pca_anomaly_history.append(pca_anomaly_rate)
+    gem_anomaly_history.append(gem_anomaly_rate)
+    noise_history.append(noise)
+
+    print("{i}: gem={gem} pca={pca}".format(i=i, gem=gem_anomaly_rate, pca=pca_anomaly_rate))
+
+    noise += delta
 
 # save log
-res_string = "--- Linear Scale took {time} seconds ---".format(time=(time.time()-start_time))
+res_string = "--- Perturbation took {time} seconds ---".format(time=(time.time()-start_time))
 res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
 res_string += "\nOnline phase:  {ads}\n".format(ads=anomalous_dataset)
 
@@ -131,16 +135,20 @@ with open ("./log.txt", 'a') as f:
 
 
 # plotting the points  
-plt.plot(k_history, anomaly_history) 
+plt.plot(noise_history, pca_anomaly_history, label="PCA") 
+plt.plot(noise_history, gem_anomaly_history, label="GEM") 
   
 # naming the x axis 
-plt.xlabel('Covariance offset') 
+plt.xlabel('Perturbation') 
 # naming the y axis 
 plt.ylabel('Anomalies found') 
   
 # giving a title to my graph 
-plt.title('{model} anomalies with increasing variance'.format(model=model)) 
+plt.title('Anomalies by perturbing the covariance')
   
 # function to show the plot 
-plt.savefig("{model}_linear_scale_covariance.png".format(model=model))
+plt.legend() 
+plt.savefig("pca_vs_gem_cov.png")
 plt.show()
+
+os._exit(0)
