@@ -120,7 +120,7 @@ for i in range(num_iterations):
 
     anomalies_found = int(N2 * anomaly_rate)
     anomaly_history.append(anomalies_found)
-    offset_history.append(noise)
+    noise_history.append(noise)
     print(str(i+1) + ": " + str(anomalies_found) + " anomalies found for offset = " + str(round(noise, 2)))
     noise += delta
 
@@ -135,7 +135,7 @@ with open ("./log.txt", 'a') as f:
     f.write(res_string)
 
 # plotting the points  
-plt.plot(offset_history, anomaly_history) 
+plt.plot(noise_history, anomaly_history) 
   
 # naming the x axis 
 plt.xlabel('Covariance perturbation') 
