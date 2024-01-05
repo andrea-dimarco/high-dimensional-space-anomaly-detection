@@ -57,20 +57,23 @@ def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
 
 # parameters
-p = 1       # data dimension
-N1 = 500    # Number of samples to generate for training
-N2 = N1 * 2 # Nnmber of samples to generate for testing
+p = 10      # data dimension
+N1 = 1      # Number of samples to generate for training
+N2 = 1000   # Nnmber of samples to generate for testing
 
-alpha = 0.1
-h = 2
+nominal_mean = 0.0
+nominal_variance = 1.0
+anomalous_mean = 0.5
+anomalous_variance = 1.5
+
+gem_alpha = 0.1
+gem_h = 2
+pca_alpha = 0.1
+pca_h = 2
 
 delta = 1
 num_trials = 2
 num_iterations = 500
-
-# mean vector
-mean = 0.0
-offset = 1
 
 # files
 file_path = "./datasets/"
@@ -82,32 +85,26 @@ start_time = time.time()
 pca_anomaly_history = []
 gem_anomaly_history = []
 dimension_history = []
+generate_dataset = "./generate_dataset n {mean} {variance} {dim} {samples} {path}"
 for i in range(num_iterations):
     # train dataset
-    mu = np.zeros(p)
-    cov_1 = np.eye(p)
-    training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N1).transpose()
-    df = pd.DataFrame(training_data)
-    df.to_csv(nominal_dataset, index=False, header=False)
-
+    os.system(generate_dataset.format(mean=nominal_mean, variance=nominal_variance, dim=p, samples=N1, path=nominal_dataset))
     # test dataset
-    cov_2 = cov_1 + np.random.uniform(mean-offset, mean+offset, (p,p))
-    df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=cov_2, size=N2).transpose())
-    df.to_csv(anomalous_dataset, index=False, header=False)
+    os.system(generate_dataset.format(mean=anomalous_mean, variance=anomalous_variance, dim=p, samples=N2, path=anomalous_dataset))
 
     # run models
     pca_offline()
-    pca_anomaly_rate = pca_online(h, alpha, num_trials)
+    pca_anomaly_rate = pca_online(pca_h, pca_alpha, num_trials)
     gem_offline()
-    gem_anomaly_rate = gem_online(h, alpha, num_trials)
+    gem_anomaly_rate = gem_online(gem_h, gem_alpha, num_trials)
 
     pca_anomaly_history.append(pca_anomaly_rate)
     gem_anomaly_history.append(gem_anomaly_rate)
     dimension_history.append(p)
-    p += delta
+    N1 += delta
 
 # save log
-res_string = "--- PCA vs GEM took {time} seconds ---".format(time=(time.time()-start_time))
+res_string = "--- PCA vs GEM (train) took {time} seconds ---".format(time=(time.time()-start_time))
 res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
 res_string += "\nOnline phase:  {ads}\n".format(ads=anomalous_dataset)
 
@@ -126,13 +123,11 @@ plt.xlabel('Dimension')
 plt.ylabel('Anomalies found') 
   
 # giving a title to my graph 
-plt.title('Anomalies with increasing dimensions')
+plt.title('Anomalies with increasing training samples')
   
 # function to show the plot 
 plt.legend() 
-plt.savefig("pca_vs_gem.png")
+plt.savefig("pca_vs_gem_train.png")
 plt.show()
 
-# visualize result
-print("\n--- %s seconds ---" % (time.time() - start_time))
 os._exit(0)
