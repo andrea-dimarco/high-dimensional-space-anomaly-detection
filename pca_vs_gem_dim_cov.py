@@ -61,10 +61,6 @@ p = 1       # data dimension
 N1 = 1000    # Number of samples to generate for training
 N2 = N1 * 2 # Nmber of samples to generate for testing
 
-nominal_mean = 0.0
-nominal_variance = 1.0
-anomalous_mean = 0.5
-anomalous_variance = 1.5
 
 gem_alpha = 0.1
 gem_h = 2
