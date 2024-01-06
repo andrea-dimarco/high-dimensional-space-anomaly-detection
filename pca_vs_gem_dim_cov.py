@@ -91,19 +91,19 @@ for i in range(num_iterations):
     cov_1 = np.eye(p)
     mu = np.zeros(p)
 
-    # train dataset
-    training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N1).transpose()
+    # test dataset
+    training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N2).transpose()
     # save datasets in csv files
     df = pd.DataFrame(training_data)
-    df.to_csv(nominal_dataset, index=False, header=False)
-
-    # test dataset
+    df.to_csv(anomalous_dataset, index=False, header=False)
+    
+    # train dataset
     noise_matrix = np.random.uniform(0,noise,size=(p,p))
     noise_matrix = (noise_matrix + noise_matrix.T) / 2
     np.fill_diagonal(noise_matrix,0)
     noisy_cov = cov_1 + noise_matrix
-    df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=noisy_cov, size=N2).transpose())
-    df.to_csv(anomalous_dataset, index=False, header=False)
+    df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=noisy_cov, size=N1).transpose())
+    df.to_csv(nominal_dataset, index=False, header=False)
 
     # run models
     pca_offline()
