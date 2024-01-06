@@ -81,14 +81,11 @@ nominal_dataset = file_path + "exp_5_train.csv"
 anomalous_dataset = file_path + "exp_5_test.csv"
 
 
-# test dataset
-noise_matrix = np.random.uniform(0,noise,size=(p,p))
-noise_matrix = (noise_matrix + noise_matrix.T) / 2
-np.fill_diagonal(noise_matrix,0)
-noisy_cov = cov_1 + noise_matrix
-df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=noisy_cov, size=N2).transpose())
-df.to_csv(anomalous_dataset, index=False, header=False)
 
+training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N2).transpose()
+# save datasets in csv files
+df = pd.DataFrame(training_data)
+df.to_csv(anomalous_dataset, index=False, header=False)
 
 # do the experiments
 start_time = time.time()
@@ -99,9 +96,12 @@ generate_dataset = "./generate_dataset n {mean} {variance} {dim} {samples} {path
 for i in range(num_iterations):
 
     # train dataset
-    training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N1).transpose()
-    # save datasets in csv files
-    df = pd.DataFrame(training_data)
+    # test dataset
+    noise_matrix = np.random.uniform(0,noise,size=(p,p))
+    noise_matrix = (noise_matrix + noise_matrix.T) / 2
+    np.fill_diagonal(noise_matrix,0)
+    noisy_cov = cov_1 + noise_matrix
+    df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=noisy_cov, size=N1).transpose())
     df.to_csv(nominal_dataset, index=False, header=False)
 
     # run models
