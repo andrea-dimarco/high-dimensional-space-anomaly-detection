@@ -63,8 +63,8 @@ N2 = 1000  # Nnmber of samples to generate for testing
 
 gem_alpha = 0.1
 gem_h = 2
-pca_alpha = 0.1
-pca_h = 2
+pca_alpha = 0.4
+pca_h = 5
 
 delta = 1
 num_trials = 1

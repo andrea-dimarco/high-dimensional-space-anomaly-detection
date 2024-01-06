@@ -64,8 +64,8 @@ model = "pca"
 
 gem_alpha = 0.1
 gem_h = 2
-pca_alpha = 0.1
-pca_h = 2
+pca_alpha = 0.4
+pca_h = 5
 
 k = 1
 delta = 0.01
