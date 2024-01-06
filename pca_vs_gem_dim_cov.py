@@ -68,8 +68,8 @@ pca_alpha = 0.1
 pca_h = 2
 
 delta = 1
-num_trials = 2
-num_iterations = 20
+num_trials = 1
+num_iterations = 500
 
 mean = 0.0
 noise = 1.0 # for the perturbation
@@ -96,7 +96,7 @@ for i in range(num_iterations):
     # save datasets in csv files
     df = pd.DataFrame(training_data)
     df.to_csv(anomalous_dataset, index=False, header=False)
-    
+
     # train dataset
     noise_matrix = np.random.uniform(0,noise,size=(p,p))
     noise_matrix = (noise_matrix + noise_matrix.T) / 2

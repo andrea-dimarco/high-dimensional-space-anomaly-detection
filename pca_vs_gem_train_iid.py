@@ -57,7 +57,7 @@ def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
 
 # parameters
-p = 10      # data dimension
+p = 100     # data dimension
 N1 = 2      # Number of samples to generate for training
 N2 = 1000   # Nnmber of samples to generate for testing
 
@@ -72,8 +72,8 @@ pca_alpha = 0.1
 pca_h = 2
 
 delta = 1
-num_trials = 2
-num_iterations = 500
+num_trials = 1
+num_iterations = 1000
 
 # files
 file_path = "./datasets/"

@@ -57,7 +57,7 @@ def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
 
 # parameters
-p = 10       # data dimension
+p = 100       # data dimension
 N1 = 1000    # Number of samples to generate for training
 N2 = N1 * 2 # Nnmber of samples to generate for testing
 model = "pca"
@@ -69,8 +69,8 @@ pca_h = 2
 
 noise = 0.1
 delta = 0.1
-num_trials = 2
-num_iterations = 50
+num_trials = 1
+num_iterations = 1000
 
 # mean vector
 mean = 0.0

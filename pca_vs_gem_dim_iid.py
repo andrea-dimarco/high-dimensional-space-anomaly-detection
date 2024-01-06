@@ -72,7 +72,7 @@ pca_alpha = 0.1
 pca_h = 2
 
 delta = 1
-num_trials = 2
+num_trials = 1
 num_iterations = 500
 
 # files
