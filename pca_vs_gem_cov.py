@@ -100,6 +100,8 @@ pca_anomaly_history = []
 gem_anomaly_history = []
 noise_history = []
 
+pca_offline()
+gem_offline()
 
 for i in range(num_iterations):
 
@@ -112,10 +114,8 @@ for i in range(num_iterations):
     df.to_csv(anomalous_dataset, index=False, header=False)
 
     # run models
-    pca_offline()
     pca_anomaly_rate = pca_online(pca_h, pca_alpha, num_trials)
     
-    gem_offline()
     gem_anomaly_rate = gem_online(gem_h, gem_alpha, num_trials)
 
     pca_anomaly_history.append(pca_anomaly_rate)

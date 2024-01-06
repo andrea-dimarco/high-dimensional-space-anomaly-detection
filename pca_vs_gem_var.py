@@ -97,15 +97,16 @@ start_time = time.time()
 pca_anomaly_history = []
 gem_anomaly_history = []
 k_history = []
+pca_offline()
+gem_offline()
+
 for i in range(num_iterations):
     # save dataset
     df = pd.DataFrame(np.random.multivariate_normal(mean=mu, cov=k*cov_1, size=N2).transpose())
     df.to_csv(anomalous_dataset, index=False, header=False)
 
     # run model
-    pca_offline()
     pca_anomaly_rate = pca_online(pca_h, pca_alpha, num_trials)
-    gem_offline()
     gem_anomaly_rate = gem_online(gem_h, gem_alpha, num_trials)
 
     pca_anomaly_history.append(pca_anomaly_rate)
