@@ -62,10 +62,10 @@ N1 = 1000    # Number of samples to generate for training
 N2 = N1 * 2 # Nmber of samples to generate for testing
 model = "pca"
 
-gem_alpha = 0.1
-gem_h = 2
-pca_alpha = 0.4
-pca_h = 5
+gem_alpha = 0.5
+gem_h = 8
+pca_alpha = gem_alpha
+pca_h = gem_h
 
 k = 1
 delta = 0.01

@@ -62,17 +62,17 @@ N1 = 1000    # Number of samples to generate for training
 N2 = N1 * 2 # Nmber of samples to generate for testing
 
 
-gem_alpha = 0.1
-gem_h = 2
-pca_alpha = 0.4
-pca_h = 5
+gem_alpha = 0.5
+gem_h = 8
+pca_alpha = gem_alpha
+pca_h = gem_h
 
 delta = 1
 num_trials = 1
 num_iterations = 500
 
 mean = 0.0
-noise = 1.0 # for the perturbation
+noise = 0.2 # for the perturbation
 
 # files
 file_path = "./datasets/"
