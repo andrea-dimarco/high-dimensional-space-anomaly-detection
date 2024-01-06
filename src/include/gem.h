@@ -45,27 +45,27 @@ public:
 
     double kNN(Eigen::MatrixXd S2, bool is_offline=false);
 
-    void save_model(std::string baseline_path="./baseline_distances.csv",
-                    std::string parameters_path="./parameters.csv",
-                    std::string S1_path="./S1.csv");
-    void load_model(std::string baseline_path="./baseline_distances.csv",
-                    std::string parameters_path="./parameters.csv",
-                    std::string S1_path="./S1.csv");
+    void save_model(std::string baseline_path="./gem_baseline_distances.csv",
+                    std::string parameters_path="./gem_parameters.csv",
+                    std::string S1_path="./gem_S1.csv");
+    void load_model(std::string baseline_path="./gem_baseline_distances.csv",
+                    std::string parameters_path="./gem_parameters.csv",
+                    std::string S1_path="./gem_S1.csv");
 
-    void save_S1(std::string file_path="./S1.csv");
-    void load_S1(std::string file_path="./S1.csv");
+    void save_S1(std::string file_path="./gem_S1.csv");
+    void load_S1(std::string file_path="./gem_S1.csv");
 
-    void save_baseline(std::string file_path="./baseline_distances.csv");
-    void load_baseline(std::string file_path="./baseline_distances.csv");
+    void save_baseline(std::string file_path="./gem_baseline_distances.csv");
+    void load_baseline(std::string file_path="./gem_baseline_distances.csv");
 
-    void save_parameters(std::string file_path="./parameters.csv");
-    void load_parameters(std::string file_path="./parameters.csv");
+    void save_parameters(std::string file_path="./gem_parameters.csv");
+    void load_parameters(std::string file_path="./gem_parameters.csv");
 
     int characteristic_function(Eigen::VectorXd v, double scalar);
 
     void offline_phase(Eigen::MatrixXd X, float partition=0.15,
-                        bool save_file=true, std::string baseline_path="./baseline_distances.csv",
-                        std::string parameters_path="./parameters.csv");
+                        bool save_file=true, std::string baseline_path="./gem_baseline_distances.csv",
+                        std::string parameters_path="./gem_parameters.csv");
 
     // return true if anomaly found
     bool online_detection(Eigen::VectorXd sample);

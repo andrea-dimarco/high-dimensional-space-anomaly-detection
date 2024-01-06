@@ -53,34 +53,34 @@ public:
     void set_h(double h);
     double get_h();
 
-    void save_baseline(std::string file_path="./baseline_distances.csv");
-    void load_baseline(std::string file_path="./baseline_distances.csv");
+    void save_baseline(std::string file_path="./pca_baseline_distances.csv");
+    void load_baseline(std::string file_path="./pca_baseline_distances.csv");
 
-    void save_res_proj(std::string file_path="./res_proj.csv");
-    void load_res_proj(std::string file_path="./res_proj.csv");
+    void save_res_proj(std::string file_path="./pca_res_proj.csv");
+    void load_res_proj(std::string file_path="./pca_res_proj.csv");
 
-    void save_mean_vector(std::string file_path="./mean_vector.csv");
-    void load_mean_vector(std::string file_path="./mean_vector.csv");
+    void save_mean_vector(std::string file_path="./pca_mean_vector.csv");
+    void load_mean_vector(std::string file_path="./pca_mean_vector.csv");
 
-    void save_parameters(std::string file_path="./parameters.csv");
-    void load_parameters(std::string file_path="./parameters.csv");
+    void save_parameters(std::string file_path="./pca_parameters.csv");
+    void load_parameters(std::string file_path="./pca_parameters.csv");
 
-    void save_model(std::string baseline_path="./baseline_distances.csv",
-                    std::string res_proj_path="./res_proj.csv",
-                    std::string mean_vector_path="./mean_vector.csv",
-                    std::string parameters_path="./parameters.csv");
-    void load_model(std::string baseline_path="./baseline_distances.csv",
-                    std::string res_proj_path="./res_proj.csv",
-                    std::string mean_vector_path="./mean_vector.csv",
-                    std::string parameters_path="./parameters.csv");
+    void save_model(std::string baseline_path="./pca_baseline_distances.csv",
+                    std::string res_proj_path="./pca_res_proj.csv",
+                    std::string mean_vector_path="./pca_mean_vector.csv",
+                    std::string parameters_path="./pca_parameters.csv");
+    void load_model(std::string baseline_path="./pca_baseline_distances.csv",
+                    std::string res_proj_path="./pca_res_proj.csv",
+                    std::string mean_vector_path="./pca_mean_vector.csv",
+                    std::string parameters_path="./pca_parameters.csv");
 
     Eigen::MatrixXd compute_covariance_matrix(Eigen::MatrixXd S1);
 
     void offline_phase(Eigen::MatrixXd X, bool strict_k=false, bool save_file=true,
-                        std::string baseline_path="./baseline_distances.csv",
-                        std::string res_proj_path="./res_proj.csv",
-                        std::string mean_vector_path="./mean_vector.csv",
-                        std::string parameters_path="./parameters.csv",
+                        std::string baseline_path="./pca_baseline_distances.csv",
+                        std::string res_proj_path="./pca_res_proj.csv",
+                        std::string mean_vector_path="./pca_mean_vector.csv",
+                        std::string parameters_path="./pca_parameters.csv",
                         bool verbosity=false);
 
     // return true if anomaly found

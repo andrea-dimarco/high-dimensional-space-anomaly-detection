@@ -99,7 +99,10 @@ start_time = time.time()
 pca_anomaly_history = []
 gem_anomaly_history = []
 noise_history = []
+
+
 for i in range(num_iterations):
+
     #create perturbated covariance matrix with null diagonal
     noise_matrix = np.random.uniform(0,noise,size=(p,p))
     noise_matrix = (noise_matrix + noise_matrix.T) / 2
