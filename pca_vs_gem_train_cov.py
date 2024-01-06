@@ -97,7 +97,7 @@ for i in range(num_iterations):
 
     # train dataset
     # test dataset
-    noise_matrix = np.random.uniform(0,noise,size=(p,p))
+    noise_matrix = np.random.uniform(-noise,noise,size=(p,p))
     noise_matrix = (noise_matrix + noise_matrix.T) / 2
     np.fill_diagonal(noise_matrix,0)
     noisy_cov = cov_1 + noise_matrix
