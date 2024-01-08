@@ -1,7 +1,4 @@
-TODO:
-- hyperparameter optimization
-- do experiments
-
 FUTURE DEVELOPEMENT:
 - GEM does not recognize a change in the distributions
 - PCA does not recognize a change in the distributions
+- optimiza the other hyper-parameters

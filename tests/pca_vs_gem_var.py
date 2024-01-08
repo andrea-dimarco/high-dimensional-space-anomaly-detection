@@ -9,7 +9,7 @@ This function performs the offline phase of the PCA model
 '''
 def pca_offline():
     global nominal_dataset
-    command = "./anomaly_detector n 1.0 1.0 y y {dataset}"
+    command = "../anomaly_detector n 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
 
 '''
@@ -18,7 +18,7 @@ This function will call the PCA model and returns the loss value
 def pca_online(h:float, alpha:float, num_trials:int) -> float:
 
     global anomalous_dataset
-    command = "./anomaly_detector n {h} {alpha} n y {dataset}"
+    command = "../anomaly_detector n {h} {alpha} n y {dataset}"
 
     # Run simulation
     output = 0
@@ -35,7 +35,7 @@ This function performs the offline phase of the GEM model
 '''
 def gem_offline():
     global nominal_dataset
-    command = "./anomaly_detector y 1.0 1.0 y y {dataset}"
+    command = "../anomaly_detector y 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
 
 '''
@@ -44,7 +44,7 @@ This function will call the PCA model and returns the loss value
 def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
     global anomalous_dataset
-    command = "./anomaly_detector y {h} {alpha} n y {dataset}"
+    command = "../anomaly_detector y {h} {alpha} n y {dataset}"
 
     # Run simulation
     output = 0
@@ -62,15 +62,15 @@ N1 = 1000    # Number of samples to generate for training
 N2 = N1 * 2 # Nmber of samples to generate for testing
 model = "pca"
 
-gem_alpha = 0.5
-gem_h = 8
+gem_alpha = 0.4
+gem_h = 5
 pca_alpha = gem_alpha
 pca_h = gem_h
 
 k = 1
-delta = 0.01
+delta = 0.005
 num_trials = 1
-num_iterations = 1000
+num_iterations = 100
 
 # mean vector
 mean = 0.0
@@ -80,7 +80,7 @@ mu = np.zeros(p)
 cov_1 = np.eye(p)
 
 # files
-file_path = "./datasets/"
+file_path = "../datasets/"
 nominal_dataset = file_path + "exp_1_train.csv"
 anomalous_dataset = file_path + "exp_1_test.csv"
 

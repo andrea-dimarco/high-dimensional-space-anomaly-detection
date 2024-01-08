@@ -9,7 +9,7 @@ This function performs the offline phase of the PCA model
 '''
 def pca_offline():
     global nominal_dataset
-    command = "./anomaly_detector n 1.0 1.0 y y {dataset}"
+    command = "../anomaly_detector n 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
 
 '''
@@ -18,7 +18,7 @@ This function will call the PCA model and returns the loss value
 def pca_online(h:float, alpha:float, num_trials:int) -> float:
 
     global anomalous_dataset
-    command = "./anomaly_detector n {h} {alpha} n y {dataset}"
+    command = "../anomaly_detector n {h} {alpha} n y {dataset}"
 
     # Run simulation
     output = 0
@@ -35,7 +35,7 @@ This function performs the offline phase of the GEM model
 '''
 def gem_offline():
     global nominal_dataset
-    command = "./anomaly_detector y 1.0 1.0 y y {dataset}"
+    command = "../anomaly_detector y 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
 
 '''
@@ -44,7 +44,7 @@ This function will call the PCA model and returns the loss value
 def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
     global anomalous_dataset
-    command = "./anomaly_detector y {h} {alpha} n y {dataset}"
+    command = "../anomaly_detector y {h} {alpha} n y {dataset}"
 
     # Run simulation
     output = 0
@@ -58,11 +58,11 @@ def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
 # parameters
 p = 100       # data dimension
-N1 = 10    # Number of samples to generate for training
+N1 = 2    # Number of samples to generate for training
 N2 = 1000  # Nnmber of samples to generate for testing
 
-gem_alpha = 0.5
-gem_h = 8
+gem_alpha = 0.4
+gem_h = 5
 pca_alpha = gem_alpha
 pca_h = gem_h
 
@@ -76,15 +76,15 @@ cov_1 = np.eye(p)
 mu = np.zeros(p)
 
 # files
-file_path = "./datasets/"
+file_path = "../datasets/"
 nominal_dataset = file_path + "exp_5_train.csv"
 anomalous_dataset = file_path + "exp_5_test.csv"
 
 
 
-training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N2).transpose()
+testing_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N2).transpose()
 # save datasets in csv files
-df = pd.DataFrame(training_data)
+df = pd.DataFrame(testing_data)
 df.to_csv(anomalous_dataset, index=False, header=False)
 
 # do the experiments
@@ -93,9 +93,9 @@ pca_anomaly_history = []
 gem_anomaly_history = []
 dimension_history = []
 generate_dataset = "./generate_dataset n {mean} {variance} {dim} {samples} {path}"
+os.system(generate_dataset.format(mean=0.0,variance=1.0,dim=p,samples=N2, path=anomalous_dataset))
 for i in range(num_iterations):
 
-    # train dataset
     # test dataset
     noise_matrix = np.random.uniform(-noise,noise,size=(p,p))
     noise_matrix = (noise_matrix + noise_matrix.T) / 2

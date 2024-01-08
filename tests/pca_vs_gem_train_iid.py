@@ -9,7 +9,7 @@ This function performs the offline phase of the PCA model
 '''
 def pca_offline():
     global nominal_dataset
-    command = "./anomaly_detector n 1.0 1.0 y y {dataset}"
+    command = "../anomaly_detector n 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
 
 '''
@@ -18,7 +18,7 @@ This function will call the PCA model and returns the loss value
 def pca_online(h:float, alpha:float, num_trials:int) -> float:
 
     global anomalous_dataset
-    command = "./anomaly_detector n {h} {alpha} n y {dataset}"
+    command = "../anomaly_detector n {h} {alpha} n y {dataset}"
 
     # Run simulation
     output = 0
@@ -35,7 +35,7 @@ This function performs the offline phase of the GEM model
 '''
 def gem_offline():
     global nominal_dataset
-    command = "./anomaly_detector y 1.0 1.0 y y {dataset}"
+    command = "../anomaly_detector y 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
 
 '''
@@ -44,7 +44,7 @@ This function will call the PCA model and returns the loss value
 def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
     global anomalous_dataset
-    command = "./anomaly_detector y {h} {alpha} n y {dataset}"
+    command = "../anomaly_detector y {h} {alpha} n y {dataset}"
 
     # Run simulation
     output = 0
@@ -57,28 +57,28 @@ def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
 
 # parameters
-p = 1       # data dimension
-N1 = 1000    # Number of samples to generate for training
-N2 = N1 * 2 # Nnmber of samples to generate for testing
+p = 100     # data dimension
+N1 = 2      # Number of samples to generate for training
+N2 = 1000   # Nnmber of samples to generate for testing
 
 nominal_mean = 0.0
 nominal_variance = 1.0
-anomalous_mean = 0.5
-anomalous_variance = 1.5
+anomalous_mean = 0.0
+anomalous_variance = 2.0
 
 gem_alpha = 0.5
 gem_h = 8
 pca_alpha = gem_alpha
 pca_h = gem_h
 
-delta = 1
+delta = 10
 num_trials = 1
-num_iterations = 500
+num_iterations = 100
 
 # files
-file_path = "./datasets/"
-nominal_dataset = file_path + "exp_3_train.csv"
-anomalous_dataset = file_path + "exp_3_test.csv"
+file_path = "../datasets/"
+nominal_dataset = file_path + "exp_4_train.csv"
+anomalous_dataset = file_path + "exp_4_test.csv"
 
 # do the experiments
 start_time = time.time()
@@ -100,14 +100,14 @@ for i in range(num_iterations):
 
     pca_anomaly_history.append(pca_anomaly_rate)
     gem_anomaly_history.append(gem_anomaly_rate)
-    dimension_history.append(p)
+    dimension_history.append(N1)
 
     print("{i}: gem={gem} pca={pca}".format(i=i, gem=gem_anomaly_rate, pca=pca_anomaly_rate))
-    
-    p += delta
+
+    N1 += delta
 
 # save log
-res_string = "--- PCA vs GEM (dimension) took {time} seconds ---".format(time=(time.time()-start_time))
+res_string = "--- PCA vs GEM (train) took {time} seconds ---".format(time=(time.time()-start_time))
 res_string += "\nOffline phase: {nds}".format(nds=nominal_dataset)
 res_string += "\nOnline phase:  {ads}\n".format(ads=anomalous_dataset)
 
@@ -126,11 +126,11 @@ plt.xlabel('Dimension')
 plt.ylabel('Anomalies found') 
   
 # giving a title to my graph 
-plt.title('Anomalies with increasing dimensions')
+plt.title('Anomalies with increasing training samples')
   
 # function to show the plot 
 plt.legend() 
-plt.savefig("pca_vs_gem_dim_iid.png")
+plt.savefig("pca_vs_gem_train.png")
 plt.show()
 
 os._exit(0)
