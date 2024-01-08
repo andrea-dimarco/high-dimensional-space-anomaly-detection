@@ -9,7 +9,7 @@ This function performs the offline phase of the PCA model
 '''
 def pca_offline():
     global nominal_dataset
-    command = "../anomaly_detector n 1.0 1.0 y y {dataset}"
+    command = "./anomaly_detector n 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
 
 '''
@@ -18,7 +18,7 @@ This function will call the PCA model and returns the loss value
 def pca_online(h:float, alpha:float, num_trials:int) -> float:
 
     global anomalous_dataset
-    command = "../anomaly_detector n {h} {alpha} n y {dataset}"
+    command = "./anomaly_detector n {h} {alpha} n y {dataset}"
 
     # Run simulation
     output = 0
@@ -35,7 +35,7 @@ This function performs the offline phase of the GEM model
 '''
 def gem_offline():
     global nominal_dataset
-    command = "../anomaly_detector y 1.0 1.0 y y {dataset}"
+    command = "./anomaly_detector y 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
 
 '''
@@ -44,7 +44,7 @@ This function will call the PCA model and returns the loss value
 def gem_online(h:float, alpha:float, num_trials:int) -> float:
 
     global anomalous_dataset
-    command = "../anomaly_detector y {h} {alpha} n y {dataset}"
+    command = "./anomaly_detector y {h} {alpha} n y {dataset}"
 
     # Run simulation
     output = 0
@@ -76,7 +76,7 @@ num_trials = 1
 num_iterations = 100
 
 # files
-file_path = "../datasets/"
+file_path = "./datasets/"
 nominal_dataset = file_path + "exp_4_train.csv"
 anomalous_dataset = file_path + "exp_4_test.csv"
 
@@ -132,5 +132,8 @@ plt.title('Anomalies with increasing training samples')
 plt.legend() 
 plt.savefig("pca_vs_gem_train.png")
 plt.show()
+
+os.system("bash ./tests/remove_garbage.sh")
+os.system("bash ./tests/remove_test_datasets.sh")
 
 os._exit(0)

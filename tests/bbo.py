@@ -13,7 +13,7 @@ This function performs the offline phase of the PCA model
 '''
 def pca_offline():
     global nominal_dataset
-    command = "../anomaly_detector n 1.0 1.0 y y {dataset}"
+    command = "./anomaly_detector n 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
     print("PCA offline phase done.")
 
@@ -24,7 +24,7 @@ def pca_online(h:float, alpha:float) -> float:
 
     global nominal_dataset
     global anomalous_dataset
-    command = "../anomaly_detector n {h} {alpha} n y {dataset}"
+    command = "./anomaly_detector n {h} {alpha} n y {dataset}"
 
     w1 = 0.4
     w2 = 0.6
@@ -49,7 +49,7 @@ This function performs the offline phase of the GEM model
 '''
 def gem_offline():
     global nominal_dataset
-    command = "../anomaly_detector y 1.0 1.0 y y {dataset}"
+    command = "./anomaly_detector y 1.0 1.0 y y {dataset}"
     os.system(command.format(dataset=nominal_dataset))
     print("GEM offline phase done.")
 
@@ -60,7 +60,7 @@ def gem_online(h:float, alpha:float) -> float:
 
     global nominal_dataset
     global anomalous_dataset
-    command = "../anomaly_detector y {h} {alpha} n y {dataset}"
+    command = "./anomaly_detector y {h} {alpha} n y {dataset}"
 
     w1 = 0.4
     w2 = 0.6
@@ -85,14 +85,14 @@ Run the Black-Box Optimizer
 '''
 model             = "gem"
 optimizer_name    = "NGOpt"
-nominal_dataset   = "../datasets/nominal-human-activity.csv" # safe samples
-anomalous_dataset = "../datasets/anomaly-human-activity.csv" # anomalous samples
+nominal_dataset   = "./datasets/nominal-human-activity.csv" # safe samples
+anomalous_dataset = "./datasets/anomaly-human-activity.csv" # anomalous samples
  
 num_workers       = 4
 num_iterations    = 125 * num_workers # write it as budget-per-worker
 
 # generate test script
-os.system("bash ./get_test_datasets.sh")
+os.system("bash ./tests/get_test_datasets.sh")
 
 #      h     alpha
 lb = [ 1.0,  0.01] # lower-bound
