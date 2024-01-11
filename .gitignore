@@ -3,5 +3,6 @@ src/main
 loss.txt
 src/suv.cpp
 src/include/suv.h
+src/Eigen/*
 *.png
 log.txt
