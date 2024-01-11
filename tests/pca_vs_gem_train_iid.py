@@ -77,8 +77,8 @@ num_iterations = 100
 
 # files
 file_path = "./datasets/"
-nominal_dataset = file_path + "exp_4_train.csv"
-anomalous_dataset = file_path + "exp_4_test.csv"
+nominal_dataset = file_path + "exp_train.csv"
+anomalous_dataset = file_path + "exp_test.csv"
 
 # do the experiments
 start_time = time.time()

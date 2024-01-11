@@ -10,18 +10,7 @@ rm ./datasets/gaussian_05_05.csv
 
 rm ./datasets/uniform_1_1.csv
 
-rm ./datasets/exp_1_train.csv
-rm ./datasets/exp_1_test.csv
+rm ./datasets/exp_train.csv
+rm ./datasets/exp_test.csv
 
-rm ./datasets/exp_2_train.csv
-rm ./datasets/exp_2_test.csv
-
-rm ./datasets/exp_3_train.csv
-rm ./datasets/exp_3_test.csv
-
-rm ./datasets/exp_4_train.csv
-rm ./datasets/exp_4_test.csv
-
-rm ./datasets/exp_5_train.csv
-rm ./datasets/exp_5_test.csv
 

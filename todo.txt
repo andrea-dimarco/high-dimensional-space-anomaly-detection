@@ -1,3 +1,9 @@
+TODO:
+- vedere delay anomalie
+- tempo singolo sample online
+- testa la threshold
+
+
 FUTURE DEVELOPEMENT:
 - GEM does not recognize a change in the distributions
 - PCA does not recognize a change in the distributions

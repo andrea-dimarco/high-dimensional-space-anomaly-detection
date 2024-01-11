@@ -76,8 +76,8 @@ noise = 0.2 # for the perturbation
 
 # files
 file_path = "./datasets/"
-nominal_dataset = file_path + "exp_5_train.csv"
-anomalous_dataset = file_path + "exp_5_test.csv"
+nominal_dataset = file_path + "exp_train.csv"
+anomalous_dataset = file_path + "exp_test.csv"
 
 
 # do the experiments
@@ -92,9 +92,9 @@ for i in range(num_iterations):
     mu = np.zeros(p)
 
     # test dataset
-    training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N2).transpose()
+    test_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N2).transpose()
     # save datasets in csv files
-    df = pd.DataFrame(training_data)
+    df = pd.DataFrame(test_data)
     df.to_csv(anomalous_dataset, index=False, header=False)
 
     # train dataset

@@ -77,8 +77,8 @@ mu = np.zeros(p)
 
 # files
 file_path = "./datasets/"
-nominal_dataset = file_path + "exp_5_train.csv"
-anomalous_dataset = file_path + "exp_5_test.csv"
+nominal_dataset = file_path + "exp_train.csv"
+anomalous_dataset = file_path + "exp_test.csv"
 
 
 

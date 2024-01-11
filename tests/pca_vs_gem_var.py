@@ -81,8 +81,8 @@ cov_1 = np.eye(p)
 
 # files
 file_path = "./datasets/"
-nominal_dataset = file_path + "exp_1_train.csv"
-anomalous_dataset = file_path + "exp_1_test.csv"
+nominal_dataset = file_path + "exp_train.csv"
+anomalous_dataset = file_path + "exp_test.csv"
 
 # Generate samples from multivariate normal distribution
 training_data = np.random.multivariate_normal(mean=mu, cov=cov_1, size=N1).transpose()

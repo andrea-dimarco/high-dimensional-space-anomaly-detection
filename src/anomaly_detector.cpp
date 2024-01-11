@@ -44,9 +44,9 @@ Eigen::MatrixXd random_dataset(int dim0=2, int dim1=2,
     return dataset;
 } /* random_dataset */
 
-double GEM_objective_function(GEM model, double h, double alpha, Eigen::MatrixXd X) {
+int GEM_objective_function(GEM model, double h, double alpha, Eigen::MatrixXd X) {
 
-    double loss = 0;
+    int delay = 0;
     int N = X.cols(); // number of samples
     int anomaly_count = 0;
     
@@ -54,20 +54,17 @@ double GEM_objective_function(GEM model, double h, double alpha, Eigen::MatrixXd
         // anomaly detection
         if (model.online_detection(X.col(i))) {
             //std::cout << anomaly_count << " anomalies found." << std::endl;
-            anomaly_count++;
-            model.reset_g();
+            delay = i;
+            break;
         }
     }
 
-    double FAR = double(anomaly_count) / double(N); // probability of 
-    loss = FAR;
-
-    return loss;
+    return delay;
 }
 
-double PCA_objective_function(PCA model, double h, double alpha, Eigen::MatrixXd X) {
+int PCA_objective_function(PCA model, double h, double alpha, Eigen::MatrixXd X) {
 
-    double loss = 0;
+    int delay = 0;
     int N = X.cols(); // number of samples
     int anomaly_count = 0;
     
@@ -75,15 +72,12 @@ double PCA_objective_function(PCA model, double h, double alpha, Eigen::MatrixXd
         // anomaly detection
         if (model.online_detection(X.col(i))) {
             //std::cout << anomaly_count << " anomalies found." << std::endl;
-            anomaly_count++;
-            model.reset_g();
+            delay = i;
+            break;
         }
     }
 
-    double FAR = double(anomaly_count) / double(N); // probability of 
-    loss = FAR;
-
-    return loss;
+    return delay;
 }
 
 /**
@@ -169,7 +163,7 @@ int main(int argc, char *argv[])
         X = random_dataset(p, N, false);
     }
 
-    double loss;
+    int delay;
     // Run model
     if (use_GEM) {
         GEM gem(p);
@@ -180,7 +174,7 @@ int main(int argc, char *argv[])
             gem.load_model();
             gem.set_h(h);
             gem.set_alpha(alpha);
-            loss = GEM_objective_function(gem, h, alpha, X);
+            delay = GEM_objective_function(gem, h, alpha, X);
         }
     } else {
         PCA pca(p);
@@ -191,7 +185,7 @@ int main(int argc, char *argv[])
             pca.load_model();
             pca.set_h(h);
             pca.set_alpha(alpha);
-            loss = PCA_objective_function(pca, h, alpha, X);
+            delay = PCA_objective_function(pca, h, alpha, X);
         }
     } 
 
@@ -202,7 +196,7 @@ int main(int argc, char *argv[])
     // myfile.close();
 
     // return results
-    std::cout << loss;
+    std::cout << delay;
 
     return 0;
 } /* main */

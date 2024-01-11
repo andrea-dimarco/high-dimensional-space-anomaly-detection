@@ -73,12 +73,12 @@ pca_h = gem_h
 
 delta = 1
 num_trials = 1
-num_iterations = 500
+num_iterations = 1
 
 # files
 file_path = "./datasets/"
-nominal_dataset = file_path + "exp_3_train.csv"
-anomalous_dataset = file_path + "exp_3_test.csv"
+nominal_dataset = file_path + "exp_train.csv"
+anomalous_dataset = file_path + "exp_test.csv"
 
 # do the experiments
 start_time = time.time()
